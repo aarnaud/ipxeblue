@@ -1,0 +1,162 @@
+basePath: /api/v1
+definitions:
+  models.Computer:
+    properties:
+      asset:
+        type: string
+      build_arch:
+        type: string
+      hostname:
+        type: string
+      id:
+        type: string
+      last_seen:
+        type: string
+      manufacturer:
+        type: string
+      name:
+        type: string
+      platform:
+        type: string
+      product:
+        type: string
+      serial:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/models.Tag'
+        type: array
+      version:
+        type: string
+    type: object
+  models.Error:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Tag:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Manage PXE boot
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ipxeblue API
+  version: "0.1"
+paths:
+  /computers:
+    get:
+      consumes:
+      - application/json
+      description: List of computers filtered or not
+      parameters:
+      - description: Offset
+        in: query
+        name: _start
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Computer'
+            type: array
+      summary: List computers
+  /computers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a computer
+      parameters:
+      - description: Computer UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Computer'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Delete computer
+    get:
+      consumes:
+      - application/json
+      description: Get a computer by Id
+      parameters:
+      - description: Computer UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Computer'
+        "404":
+          description: Computer with uuid %s not found
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get computer
+    put:
+      consumes:
+      - application/json
+      description: Update a computer
+      parameters:
+      - description: Computer UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: id
+        required: true
+        type: string
+      - description: json format computer
+        in: body
+        name: computer
+        required: true
+        schema:
+          $ref: '#/definitions/models.Computer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Computer'
+        "400":
+          description: Query ID and UUID miss match
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unmarshall error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Update computer
+swagger: "2.0"

@@ -1,0 +1,24 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    environment:
+      - POSTGRES_USER=ipxeblue
+      - POSTGRES_PASSWORD=thisisnotapassword
+      - POSTGRES_DB=ipxeblue
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  webui:
+    image: node:lts-buster
+    working_dir: /webui
+    volumes:
+    - ./webui:/webui
+    command: "yarn start"
+    ports:
+      - 3000:3000
+volumes:
+  db-data:
+    driver: local
