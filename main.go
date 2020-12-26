@@ -59,11 +59,11 @@ func main() {
 		c.Next()
 	})
 
-	// Configure SwaggerUI
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
 	if gin.Mode() == gin.DebugMode {
+		// Configure SwaggerUI
+		url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+		// proxies UI call to nodejs react server
 		router.Use(MidlewareWebUI())
 	} else {
 		// Serve react-admin webui
