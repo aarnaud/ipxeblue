@@ -3,6 +3,7 @@ import {
     ArrayInput,
     Datagrid,
     DateField,
+    DateTimeInput,
     Edit,
     EditButton,
     Filter,
@@ -52,7 +53,7 @@ export const ComputerEdit = props => (
             <TextInput source="id" disabled />
             <TextInput source="mac" disabled />
             <TextInput source="hostname" disabled />
-            <TextInput source="last_seen" disabled />
+            <DateTimeInput source="last_seen" disabled />
             <TextInput source="platform" disabled />
             <TextInput source="build_arch" disabled />
             <TextInput source="manufacturer" disabled />
@@ -60,6 +61,9 @@ export const ComputerEdit = props => (
             <TextInput source="serial" disabled />
             <TextInput source="asset" disabled />
             <TextInput source="version" disabled />
+            <DateTimeInput source="last_login" disabled />
+            <DateTimeInput source="created_at" disabled />
+            <DateTimeInput source="updated_at" disabled />
             <ArrayInput source="tags">
                 <SimpleFormIterator>
                     <TextInput source="key" label="key" validate={[required()]} />

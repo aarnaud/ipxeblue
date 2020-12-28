@@ -39,8 +39,12 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 		order = value
 	}
 	if value, exist := c.GetQuery("_sort"); exist {
-		if value == "id" {
+		// react-admin use id as primary key, so we convert the key depends of object
+		if value == "id" && strings.Contains(c.FullPath(), "/computers") {
 			value = "uuid"
+		}
+		if value == "id" && strings.Contains(c.FullPath(), "/ipxeaccounts") {
+			value = "username"
 		}
 		db = db.Order(fmt.Sprintf("%s %s", ToSnakeCase(value), order))
 	}

@@ -21,6 +21,8 @@ type Computer struct {
 	Serial       string         `json:"serial"`
 	Version      string         `json:"version"`
 	Tags         []Tag          `gorm:"foreignkey:ComputerUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tags"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
 }
 
 // MarshalJSON initializes nil slices and then marshals the bag to JSON

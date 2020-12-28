@@ -38,6 +38,7 @@ func Database() *gorm.DB {
 
 	err = db.AutoMigrate(&models.Computer{})
 	err = db.AutoMigrate(&models.Tag{})
+	err = db.AutoMigrate(&models.Ipxeaccount{})
 	if err != nil {
 		fmt.Println(err)
 		panic("Failed to migrate database!")

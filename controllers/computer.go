@@ -95,7 +95,7 @@ func UpdateComputer(c *gin.Context) {
 
 	// clean tags not present in updated object
 	computer := models.Computer{}
-	db.Preload("Tags").First(&computer, computerUpdate.Uuid)
+	db.Preload("Tags").First(&computer, "uuid = ?", computerUpdate.Uuid)
 	for _, tagInDB := range computer.Tags {
 		toDelete := true
 		for _, tagToKeep := range computerUpdate.Tags {
@@ -116,7 +116,7 @@ func UpdateComputer(c *gin.Context) {
 
 	// refresh data from DB before return it
 	computer = models.Computer{}
-	db.Preload("Tags").First(&computer, computerUpdate.Uuid)
+	db.Preload("Tags").First(&computer, "uuid = ?", computerUpdate.Uuid)
 
 	c.JSON(http.StatusOK, computer)
 }

@@ -5,14 +5,12 @@ import (
 	"github.com/aarnaud/ipxeblue/config"
 	"github.com/aarnaud/ipxeblue/controllers"
 	_ "github.com/aarnaud/ipxeblue/docs"
+	"github.com/aarnaud/ipxeblue/midlewares"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
-	"net/http/httputil"
-	"strings"
 	"time"
 )
 
@@ -64,54 +62,34 @@ func main() {
 		url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 		// proxies UI call to nodejs react server
-		router.Use(MidlewareWebUI())
+		router.Use(midlewares.MidlewareDevWebUI())
 	} else {
 		// Serve react-admin webui
 		router.Static("/ui", "./ui")
 	}
 
 	// iPXE request
-	router.GET("/", controllers.Index)
+	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount())
+
+	ipxeroute.GET("/", controllers.Index)
 
 	// API
 	v1 := router.Group("/api/v1")
 	{
+		// Computer
 		v1.GET("/computers", controllers.ListComputers)
 		v1.GET("/computers/:id", controllers.GetComputer)
 		v1.PUT("/computers/:id", controllers.UpdateComputer)
 		v1.DELETE("/computers/:id", controllers.DeleteComputer)
+
+		// Computer
+		v1.GET("/ipxeaccounts", controllers.ListIpxeaccount)
+		v1.GET("/ipxeaccounts/:username", controllers.GetIpxeaccount)
+		v1.POST("/ipxeaccounts", controllers.CreateIpxeaccount)
+		v1.PUT("/ipxeaccounts/:username", controllers.UpdateIpxeaccount)
+		v1.DELETE("/ipxeaccounts/:username", controllers.DeleteIpxeaccount)
 	}
 
 	router.Run(fmt.Sprintf(":%d", port))
 }
 
-func MidlewareWebUI() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/") {
-			c.Next()
-			return
-		}
-		if c.Request.URL.Path == "/ui" || c.Request.URL.Path == "/ui/" {
-			ProxyWebUI(c)
-		}
-		if strings.Contains(c.Request.Header.Get("Referer"), "/ui") {
-			ProxyWebUI(c)
-			return
-		}
-		if c.Request.Header.Get("Upgrade") == "websocket" {
-			ProxyWebUI(c)
-			return
-		}
-		c.Next()
-	}
-}
-
-func ProxyWebUI(c *gin.Context) {
-	director := func(req *http.Request) {
-		req.URL = c.Request.URL
-		req.URL.Scheme = "http"
-		req.URL.Host = "localhost:3000"
-	}
-	proxy := &httputil.ReverseProxy{Director: director}
-	proxy.ServeHTTP(c.Writer, c.Request)
-}
