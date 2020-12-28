@@ -245,8 +245,8 @@ var doc = `{
                             "$ref": "#/definitions/models.Ipxeaccount"
                         }
                     },
-                    "404": {
-                        "description": "Can not find ID",
+                    "400": {
+                        "description": "Failed to create account in DB",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -287,7 +287,7 @@ var doc = `{
                         }
                     },
                     "404": {
-                        "description": "Computer with uuid %s not found",
+                        "description": "iPXE account not found",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -335,7 +335,7 @@ var doc = `{
                         }
                     },
                     "404": {
-                        "description": "Can not find ID",
+                        "description": "iPXE account not found",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -374,7 +374,7 @@ var doc = `{
                         }
                     },
                     "404": {
-                        "description": "Can not find ID",
+                        "description": "iPXE account not found",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -447,6 +447,9 @@ var doc = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "is_admin": {
+                    "type": "boolean"
                 },
                 "last_login": {
                     "type": "string"

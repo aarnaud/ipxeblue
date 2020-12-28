@@ -8,7 +8,6 @@ import (
 	"github.com/aarnaud/ipxeblue/midlewares"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"time"
@@ -25,13 +24,8 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
-	// Enable VIPER to read Environment Variables
-	viper.AutomaticEnv() // To get the value from the config file using key// viper package read .env
+	appconf := config.GetConfig()
 
-	port := 8080
-	if p := viper.GetInt("PORT"); p != 0 {
-		port = p
-	}
 	router := gin.Default()
 
 	// CORS for https://foo.com and https://github.com origins, allowing:
@@ -69,27 +63,34 @@ func main() {
 	}
 
 	// iPXE request
-	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount())
+	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))
 
 	ipxeroute.GET("/", controllers.Index)
 
-	// API
-	v1 := router.Group("/api/v1")
-	{
-		// Computer
-		v1.GET("/computers", controllers.ListComputers)
-		v1.GET("/computers/:id", controllers.GetComputer)
-		v1.PUT("/computers/:id", controllers.UpdateComputer)
-		v1.DELETE("/computers/:id", controllers.DeleteComputer)
 
-		// Computer
-		v1.GET("/ipxeaccounts", controllers.ListIpxeaccount)
-		v1.GET("/ipxeaccounts/:username", controllers.GetIpxeaccount)
-		v1.POST("/ipxeaccounts", controllers.CreateIpxeaccount)
-		v1.PUT("/ipxeaccounts/:username", controllers.UpdateIpxeaccount)
-		v1.DELETE("/ipxeaccounts/:username", controllers.DeleteIpxeaccount)
+	var v1 *gin.RouterGroup
+	if appconf.EnableAPIAuth {
+		// API
+		v1 = router.Group("/api/v1", midlewares.BasicAuthIpxeAccount(true))
+	} else {
+		// API
+		v1 = router.Group("/api/v1")
 	}
 
-	router.Run(fmt.Sprintf(":%d", port))
+	// Computer
+	v1.GET("/computers", controllers.ListComputers)
+	v1.GET("/computers/:id", controllers.GetComputer)
+	v1.PUT("/computers/:id", controllers.UpdateComputer)
+	v1.DELETE("/computers/:id", controllers.DeleteComputer)
+
+	// Computer
+	v1.GET("/ipxeaccounts", controllers.ListIpxeaccount)
+	v1.GET("/ipxeaccounts/:username", controllers.GetIpxeaccount)
+	v1.POST("/ipxeaccounts", controllers.CreateIpxeaccount)
+	v1.PUT("/ipxeaccounts/:username", controllers.UpdateIpxeaccount)
+	v1.DELETE("/ipxeaccounts/:username", controllers.DeleteIpxeaccount)
+
+
+	router.Run(fmt.Sprintf(":%d", appconf.Port))
 }
 

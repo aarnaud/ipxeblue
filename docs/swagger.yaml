@@ -42,6 +42,8 @@ definitions:
     properties:
       created_at:
         type: string
+      is_admin:
+        type: boolean
       last_login:
         type: string
       password:
@@ -214,8 +216,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Ipxeaccount'
-        "404":
-          description: Can not find ID
+        "400":
+          description: Failed to create account in DB
           schema:
             $ref: '#/definitions/models.Error'
         "500":
@@ -242,7 +244,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Ipxeaccount'
         "404":
-          description: Can not find ID
+          description: iPXE account not found
           schema:
             $ref: '#/definitions/models.Error'
       summary: Delete iPXE account
@@ -264,7 +266,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Ipxeaccount'
         "404":
-          description: Computer with uuid %s not found
+          description: iPXE account not found
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get iPXE account
@@ -296,7 +298,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
         "404":
-          description: Can not find ID
+          description: iPXE account not found
           schema:
             $ref: '#/definitions/models.Error'
         "500":

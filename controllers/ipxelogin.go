@@ -119,7 +119,7 @@ func UpdateIpxeaccount(c *gin.Context) {
 		return
 	}
 
-	result := db.Model(&accountUpdate).Updates(&accountUpdate)
+	result := db.Model(&accountUpdate).Updates(accountUpdate)
 
 	if result.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Error{

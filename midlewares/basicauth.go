@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
-func BasicAuthIpxeAccount() gin.HandlerFunc {
+func BasicAuthIpxeAccount(onlyAdmin bool) gin.HandlerFunc {
 	realm := "Basic realm=" + strconv.Quote("Authorization Required")
 	return func(c *gin.Context) {
 		db := c.MustGet("db").(*gorm.DB)
@@ -32,7 +33,13 @@ func BasicAuthIpxeAccount() gin.HandlerFunc {
 		}
 
 		account := models.Ipxeaccount{}
-		result := db.First(&account, "username = ?", pair[0])
+		var result *gorm.DB
+		if onlyAdmin {
+			result = db.First(&account, "username = ? AND is_admin = TRUE", pair[0])
+		} else {
+			result = db.First(&account, "username = ?", pair[0])
+		}
+
 		if result.RowsAffected == 0 {
 			c.Header("WWW-Authenticate", realm)
 			c.AbortWithStatus(http.StatusUnauthorized)
@@ -43,6 +50,12 @@ func BasicAuthIpxeAccount() gin.HandlerFunc {
 			c.Header("WWW-Authenticate", realm)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
+		}
+
+		// update last login field if it's older than 5min
+		if time.Now().Sub(account.LastLogin).Seconds() > 300 {
+			account.LastLogin = time.Now()
+			db.Model(&account).Updates(account)
 		}
 	}
 }
