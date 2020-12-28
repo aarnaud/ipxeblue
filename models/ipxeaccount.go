@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -21,19 +20,6 @@ type Ipxeaccount struct {
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
-}
-
-// BeforeSave : hook before a user is saved
-func (o *Ipxeaccount) BeforeSave(tx *gorm.DB) (err error) {
-	if o.Password != "" {
-		hash, err := HashPassword(o.Password)
-		if err != nil {
-			return nil
-		}
-		o.Password = hash
-	}
-
-	return
 }
 
 // MarshalJSON initializes nil slices and then marshals the bag to JSON
@@ -66,6 +52,13 @@ func (c *Ipxeaccount) UnmarshalJSON(data []byte) error {
 	}
 	if aux.Password != "" && aux.Password != aux.PasswordConfirmation {
 		return fmt.Errorf("Password missmatch")
+	}
+	if aux.Password != "" {
+		hash, err := HashPassword(aux.Password)
+		if err != nil {
+			return err
+		}
+		aux.Password = hash
 	}
 	return nil
 }
