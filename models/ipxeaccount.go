@@ -10,7 +10,7 @@ import (
 type Ipxeaccount struct {
 	Username  string    `gorm:"primarykey" json:"username"`
 	Password  string    `json:"password,omitempty"`
-	IsAdmin   *bool      `json:"is_admin"`
+	IsAdmin   *bool     `json:"is_admin"`
 	LastLogin time.Time `json:"last_login"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -33,7 +33,7 @@ func (o Ipxeaccount) MarshalJSON() ([]byte, error) {
 		Id string `json:"id"`
 		Alias
 	}{
-		Id: alias.Username,
+		Id:    alias.Username,
 		Alias: alias,
 	})
 

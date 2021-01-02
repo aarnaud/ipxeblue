@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/aarnaud/ipxeblue/models"
 	"github.com/gin-gonic/gin"
-	uuid2 "github.com/google/uuid"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -127,14 +127,15 @@ func UpdateComputer(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param   id  path     string     true        "Computer UUID" minlength(36) maxlength(36)
-// @Success 200 {object} models.Computer
+// @Success 200
+// @Failure 400 {object} models.Error "Failed to parse UUID"
 // @Failure 404 {object} models.Error "Can not find ID"
 // @Router /computers/{id} [delete]
 func DeleteComputer(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	id := c.Param("id")
-	uuid, err := uuid2.Parse(id)
+	uuid, err := uuid.Parse(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
 			Error: err.Error(),
