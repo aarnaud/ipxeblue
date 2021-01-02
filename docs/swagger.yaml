@@ -1,8 +1,40 @@
 basePath: /api/v1
 definitions:
+  models.Bootentry:
+    properties:
+      computers:
+        items:
+          $ref: '#/definitions/models.Computer'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/models.BootentryFile'
+        type: array
+      id:
+        type: string
+      ipxe_script:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.BootentryFile:
+    properties:
+      name:
+        type: string
+      protected:
+        type: boolean
+    type: object
   models.Computer:
     properties:
       asset:
+        type: string
+      bootentry_uuid:
         type: string
       build_arch:
         type: string
@@ -71,6 +103,144 @@ info:
   title: ipxeblue API
   version: "0.1"
 paths:
+  /Bootentries/{username}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Bootentry
+      parameters:
+      - description: Bootentry UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Failed to parse UUID
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Bootentry UUID not found
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Delete Bootentry
+  /bootentries:
+    get:
+      consumes:
+      - application/json
+      description: List of Bootentry filtered or not
+      parameters:
+      - description: Offset
+        in: query
+        name: _start
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Bootentry'
+            type: array
+      summary: List Bootentries
+    post:
+      consumes:
+      - application/json
+      description: Create a Bootentry
+      parameters:
+      - description: json format Bootentry
+        in: body
+        name: bootentry
+        required: true
+        schema:
+          $ref: '#/definitions/models.Bootentry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Bootentry'
+        "400":
+          description: Failed to create account in DB
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unmarshall error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Create Bootentry
+  /bootentries/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Bootentry by Id
+      parameters:
+      - description: Bootentry UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Bootentry'
+        "404":
+          description: Computer with uuid %s not found
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get Bootentry
+  /bootentries/{username}:
+    put:
+      consumes:
+      - application/json
+      description: Update a Bootentry
+      parameters:
+      - description: Bootentry UUID
+        in: path
+        maxLength: 36
+        minLength: 36
+        name: uuid
+        required: true
+        type: string
+      - description: json format of Bootentry
+        in: body
+        name: bootentry
+        required: true
+        schema:
+          $ref: '#/definitions/models.Bootentry'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Bootentry'
+        "400":
+          description: Query uuid and uuid miss match
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Bootentry UUID not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unmarshall error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Update Bootentry
   /computers:
     get:
       consumes:
@@ -108,9 +278,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: ""
+        "400":
+          description: Failed to parse UUID
           schema:
-            $ref: '#/definitions/models.Computer'
+            $ref: '#/definitions/models.Error'
         "404":
           description: Can not find ID
           schema:

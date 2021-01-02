@@ -1,3 +1,7 @@
 .ra-input-tags .ra-input {
   display: inline-block;
 }
+
+.ra-input-files .ra-input {
+  display: inline-block;
+}

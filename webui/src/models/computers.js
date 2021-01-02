@@ -8,8 +8,10 @@ import {
     EditButton,
     Filter,
     List,
+    SelectInput,
     SimpleForm,
     SimpleFormIterator,
+    ReferenceInput,
     TextField,
     TextInput,
     required,
@@ -50,6 +52,9 @@ export const ComputerEdit = props => (
     <Edit undoable={false} {...props}>
         <SimpleForm>
             <TextInput source="name" />
+            <ReferenceInput label="Bootentry" source="bootentry_uuid" allowEmpty={true} reference="bootentries">
+                <SelectInput optionText="description" />
+            </ReferenceInput>
             <TextInput source="id" disabled />
             <TextInput source="mac" disabled />
             <TextInput source="hostname" disabled />

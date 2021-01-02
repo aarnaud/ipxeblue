@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/aarnaud/ipxeblue/config"
 	"github.com/aarnaud/ipxeblue/controllers"
 	_ "github.com/aarnaud/ipxeblue/docs"
 	"github.com/aarnaud/ipxeblue/midlewares"
+	"github.com/aarnaud/ipxeblue/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -24,7 +24,7 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
-	appconf := config.GetConfig()
+	appconf := utils.GetConfig()
 
 	router := gin.Default()
 
@@ -43,11 +43,14 @@ func main() {
 	}))
 
 	router.LoadHTMLGlob("templates/*")
-	db := config.Database()
+	db := utils.Database()
+	filestore := utils.NewFileStore(appconf)
 
 	// Provide db variable to controllers
 	router.Use(func(c *gin.Context) {
 		c.Set("db", db)
+		c.Set("filestore", filestore)
+		c.Set("config", appconf)
 		c.Next()
 	})
 
@@ -64,9 +67,9 @@ func main() {
 
 	// iPXE request
 	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))
-
-	ipxeroute.GET("/", controllers.Index)
-
+	ipxeroute.GET("/", controllers.IpxeScript)
+	// TODO: manage auth
+	router.GET("/files/:uuid/:filename", controllers.DownloadFiles)
 
 	var v1 *gin.RouterGroup
 	if appconf.EnableAPIAuth {
@@ -83,14 +86,20 @@ func main() {
 	v1.PUT("/computers/:id", controllers.UpdateComputer)
 	v1.DELETE("/computers/:id", controllers.DeleteComputer)
 
-	// Computer
+	// IPXE account
 	v1.GET("/ipxeaccounts", controllers.ListIpxeaccount)
 	v1.GET("/ipxeaccounts/:username", controllers.GetIpxeaccount)
 	v1.POST("/ipxeaccounts", controllers.CreateIpxeaccount)
 	v1.PUT("/ipxeaccounts/:username", controllers.UpdateIpxeaccount)
 	v1.DELETE("/ipxeaccounts/:username", controllers.DeleteIpxeaccount)
 
+	// Bootentry
+	v1.GET("/bootentries", controllers.ListBootentries)
+	v1.GET("/bootentries/:uuid", controllers.GetBootentry)
+	v1.POST("/bootentries", controllers.CreateBootentry)
+	v1.PUT("/bootentries/:uuid", controllers.UpdateBootentry)
+	v1.DELETE("/bootentries/:uuid", controllers.DeleteBootentry)
+	v1.POST("/bootentries/:uuid/files/:name", controllers.UploadBootentryFile)
 
 	router.Run(fmt.Sprintf(":%d", appconf.Port))
 }
-

@@ -1,4 +1,4 @@
-package config
+package utils
 
 import (
 	"fmt"
@@ -39,6 +39,8 @@ func Database() *gorm.DB {
 	err = db.AutoMigrate(&models.Computer{})
 	err = db.AutoMigrate(&models.Tag{})
 	err = db.AutoMigrate(&models.Ipxeaccount{})
+	err = db.AutoMigrate(&models.BootentryFile{})
+	err = db.AutoMigrate(&models.Bootentry{})
 	if err != nil {
 		fmt.Println(err)
 		panic("Failed to migrate database!")

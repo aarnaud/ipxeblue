@@ -40,12 +40,7 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 	}
 	if value, exist := c.GetQuery("_sort"); exist {
 		// react-admin use id as primary key, so we convert the key depends of object
-		if value == "id" && strings.Contains(c.FullPath(), "/computers") {
-			value = "uuid"
-		}
-		if value == "id" && strings.Contains(c.FullPath(), "/ipxeaccounts") {
-			value = "username"
-		}
+		value = ConvertReactAdminID(c, value)
 		db = db.Order(fmt.Sprintf("%s %s", ToSnakeCase(value), order))
 	}
 
@@ -55,6 +50,8 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 		}
 		if len(v) > 0 {
 			value := v[0]
+			// react-admin use id as primary key, so we convert the key depends of object
+			q = ConvertReactAdminID(c, q)
 			if strings.Contains(value, "%") {
 				db = db.Where(fmt.Sprintf("%s ~~ ?", q), value)
 			} else {
@@ -64,4 +61,17 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 	}
 
 	return db
+}
+
+func ConvertReactAdminID(c *gin.Context, key string) string {
+	if key == "id" && strings.Contains(c.FullPath(), "/computers") {
+		return "uuid"
+	}
+	if key == "id" && strings.Contains(c.FullPath(), "/bootentries") {
+		return "uuid"
+	}
+	if key == "id" && strings.Contains(c.FullPath(), "/ipxeaccounts") {
+		return "username"
+	}
+	return key
 }

@@ -11,6 +11,22 @@ services:
     ports:
       - 5432:5432
 
+  minio:
+    image: minio/minio
+    volumes:
+      - data:/data
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server /data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
   webui:
     image: node:lts-buster
     working_dir: /webui
@@ -21,4 +37,6 @@ services:
       - 3000:3000
 volumes:
   db-data:
+    driver: local
+  data:
     driver: local

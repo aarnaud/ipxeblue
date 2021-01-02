@@ -81,9 +81,10 @@ func UpdateComputer(c *gin.Context) {
 		return
 	}
 
-	result := db.Model(&computerUpdate).Preload("Tags").Updates(models.Computer{
-		Name: computerUpdate.Name,
-		Tags: computerUpdate.Tags,
+	result := db.Model(&computerUpdate).Preload("Tags").Updates(map[string]interface{}{
+		"Name":          computerUpdate.Name,
+		"Tags":          computerUpdate.Tags,
+		"BootentryUUID": computerUpdate.BootentryUUID,
 	})
 
 	if result.RowsAffected == 0 {
@@ -133,17 +134,10 @@ func UpdateComputer(c *gin.Context) {
 // @Router /computers/{id} [delete]
 func DeleteComputer(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-
-	id := c.Param("id")
-	uuid, err := uuid.Parse(id)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
-			Error: err.Error(),
-		})
-	}
+	id := uuid.MustParse(c.Param("id"))
 
 	computer := models.Computer{
-		Uuid: uuid,
+		Uuid: id,
 	}
 	result := db.Delete(&computer)
 	if result.RowsAffected == 0 {
