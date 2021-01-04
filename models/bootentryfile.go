@@ -9,6 +9,7 @@ import (
 type BootentryFile struct {
 	Name          string    `gorm:"primaryKey;index" json:"name"`
 	Protected     *bool     `json:"protected"`
+	Templatized   *bool     `json:"templatized"`
 	BootentryUUID uuid.UUID `gorm:"type:uuid;primaryKey;index" json:"-"`
 }
 

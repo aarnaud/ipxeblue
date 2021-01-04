@@ -29,6 +29,8 @@ definitions:
         type: string
       protected:
         type: boolean
+      templatized:
+        type: boolean
     type: object
   models.Computer:
     properties:

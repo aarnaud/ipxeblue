@@ -637,6 +637,9 @@ var doc = `{
                 },
                 "protected": {
                     "type": "boolean"
+                },
+                "templatized": {
+                    "type": "boolean"
                 }
             }
         },
