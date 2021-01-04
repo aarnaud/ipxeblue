@@ -19,7 +19,8 @@ import {
 
 const IpxeaccountFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="username" source="username" alwaysOn />
+        <TextInput label="Username" source="username" alwaysOn />
+        <BooleanInput label="Is Admin" source="is_admin" alwaysOn />
     </Filter>
 );
 

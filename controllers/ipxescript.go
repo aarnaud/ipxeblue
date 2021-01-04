@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr) models.Computer {
+func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip pgtype.Inet) models.Computer {
 	db := c.MustGet("db").(*gorm.DB)
 
 	computer := models.Computer{
@@ -27,6 +27,7 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr) mo
 		Hostname:     c.DefaultQuery("hostname", ""),
 		LastSeen:     time.Now(),
 		Mac:          mac,
+		IP:           ip,
 		Manufacturer: c.DefaultQuery("manufacturer", ""),
 		Platform:     c.DefaultQuery("platform", ""),
 		Product:      c.DefaultQuery("product", ""),
@@ -42,6 +43,7 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr) mo
 		computer.Hostname = c.DefaultQuery("hostname", "")
 		computer.LastSeen = time.Now()
 		computer.Mac = mac
+		computer.IP = ip
 		computer.Manufacturer = c.DefaultQuery("manufacturer", "")
 		computer.Platform = c.DefaultQuery("platform", "")
 		computer.Product = c.DefaultQuery("product", "")
@@ -72,7 +74,16 @@ func IpxeScript(c *gin.Context) {
 		return
 	}
 
-	computer := updateOrCreateComputer(c, id, mac)
+	ip := pgtype.Inet{}
+	err = ip.DecodeText(nil, []byte(c.Query("ip")))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	computer := updateOrCreateComputer(c, id, mac, ip)
 
 	c.Header("Content-Type", "text/plain; charset=utf-8")
 	bootentry := models.Bootentry{}

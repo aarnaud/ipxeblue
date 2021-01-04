@@ -22,10 +22,14 @@ import {
 const ComputerFilter = (props) => (
     <Filter {...props}>
         <TextInput label="name" source="name" alwaysOn />
-        <TextInput label="MAC" source="mac" allowEmpty />
+        <TextInput label="MAC" source="mac" alwaysOn />
+        <TextInput label="IP" source="ip" alwaysOn />
+        <TextInput label="Manufacturer" source="manufacturer" alwaysOn />
+        <TextInput label="Product" source="product" alwaysOn />
+        <TextInput label="Serial" source="serial" alwaysOn />
         <TextInput label="Build Arch" source="build_arch" allowEmpty />
         <TextInput label="Platform" source="platform" allowEmpty />
-        <ReferenceInput label="Bootentry" source="bootentry_uuid" allowEmpty={true} reference="bootentries">
+        <ReferenceInput label="Bootentry" source="bootentry_uuid" alwaysOn allowEmpty={true} reference="bootentries">
             <SelectInput optionText="name" />
         </ReferenceInput>
     </Filter>
@@ -37,6 +41,7 @@ export const ComputerList = props => (
             <TextField source="name" />
             <TextField source="id" />
             <TextField source="mac" />
+            <TextField source="ip" />
             <TextField source="hostname" />
             <DateField source="last_seen" showTime={true} />
             <TextField source="platform" />
@@ -44,7 +49,6 @@ export const ComputerList = props => (
             <TextField source="manufacturer" />
             <TextField source="product" />
             <TextField source="serial" />
-            <TextField source="asset" />
             <TextField source="version" />
             <ReferenceField label="Bootentry" source="bootentry_uuid" reference="bootentries">
                 <TextField source="name" />
@@ -64,6 +68,7 @@ export const ComputerEdit = props => (
             </ReferenceInput>
             <TextInput source="id" disabled />
             <TextInput source="mac" disabled />
+            <TextInput source="ip" disabled />
             <TextInput source="hostname" disabled />
             <DateTimeInput source="last_seen" disabled />
             <TextInput source="platform" disabled />

@@ -19,7 +19,8 @@ import {
 
 const BootentryFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="name" source="name" alwaysOn />
+        <TextInput label="Name" source="name" alwaysOn />
+        <TextInput label="Description" source="description" alwaysOn />
     </Filter>
 );
 

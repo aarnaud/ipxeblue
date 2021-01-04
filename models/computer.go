@@ -10,6 +10,7 @@ import (
 type Computer struct {
 	Uuid          uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	Mac           pgtype.Macaddr `gorm:"type:macaddr;index:idx_mac" json:"-"`
+	IP            pgtype.Inet    `gorm:"type:inet;index:idx_ip" json:"-"`
 	Asset         string         `json:"asset"`
 	BuildArch     string         `json:"build_arch"`
 	Hostname      string         `json:"hostname"`
@@ -35,9 +36,11 @@ func (c Computer) MarshalJSON() ([]byte, error) {
 	type Alias Computer
 	return json.Marshal(&struct {
 		Mac string `json:"mac"`
+		IP  string `json:"ip"`
 		Alias
 	}{
 		Mac:   c.Mac.Addr.String(),
+		IP:    c.IP.IPNet.IP.String(),
 		Alias: (Alias)(c),
 	})
 
@@ -47,6 +50,7 @@ func (c *Computer) UnmarshalJSON(data []byte) error {
 	type Alias Computer
 	aux := &struct {
 		Mac string `json:"mac"`
+		IP  string `json:"ip"`
 		*Alias
 	}{
 		Alias: (*Alias)(c),
@@ -55,6 +59,9 @@ func (c *Computer) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if err := c.Mac.DecodeText(nil, []byte(aux.Mac)); err != nil {
+		return err
+	}
+	if err := c.IP.DecodeText(nil, []byte(aux.IP)); err != nil {
 		return err
 	}
 	return nil
