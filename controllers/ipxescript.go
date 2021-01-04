@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/aarnaud/ipxeblue/models"
 	"github.com/aarnaud/ipxeblue/utils"
 	"github.com/gin-gonic/gin"
@@ -96,6 +97,7 @@ func IpxeScript(c *gin.Context) {
 
 	writer := bytes.NewBuffer([]byte{})
 	writer.Write([]byte("#!ipxe\n"))
+	writer.Write([]byte(fmt.Sprintf("echo Booting %s\n", bootentry.Description)))
 
 	// if bootentry selected is menu load all bootentries as template
 	if bootentry.Name == "menu" {
@@ -123,6 +125,12 @@ func IpxeScript(c *gin.Context) {
 			})
 			return
 		}
+		// reset bootentry
+		computer.BootentryUUID = uuid.Nil
+		db.Save(&computer)
+
+		// add failed goto that can be use in ipxescript
+		writer.Write([]byte("\n\n:failed\necho Booting failed, waiting 10 sec\nsleep 10\nexit 1"))
 	}
 
 	c.Data(http.StatusOK, "text/plain", writer.Bytes())
