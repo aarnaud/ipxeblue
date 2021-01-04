@@ -12,6 +12,7 @@ import {
     SimpleForm,
     SimpleFormIterator,
     ReferenceInput,
+    ReferenceField,
     TextField,
     TextInput,
     required,
@@ -24,6 +25,9 @@ const ComputerFilter = (props) => (
         <TextInput label="MAC" source="mac" allowEmpty />
         <TextInput label="Build Arch" source="build_arch" allowEmpty />
         <TextInput label="Platform" source="platform" allowEmpty />
+        <ReferenceInput label="Bootentry" source="bootentry_uuid" allowEmpty={true} reference="bootentries">
+            <SelectInput optionText="name" />
+        </ReferenceInput>
     </Filter>
 );
 
@@ -42,6 +46,9 @@ export const ComputerList = props => (
             <TextField source="serial" />
             <TextField source="asset" />
             <TextField source="version" />
+            <ReferenceField label="Bootentry" source="bootentry_uuid" reference="bootentries">
+                <TextField source="name" />
+            </ReferenceField>
             <EditButton />
         </Datagrid>
     </List>
