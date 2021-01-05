@@ -65,11 +65,12 @@ func main() {
 		router.Static("/ui", "./ui")
 	}
 
-	// iPXE request
+	// iPXE request with auth
 	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))
 	ipxeroute.GET("/", controllers.IpxeScript)
-	// TODO: manage auth
-	router.GET("/files/:uuid/:filename", controllers.DownloadFiles)
+
+	router.GET("/files/public/:uuid/:filename", controllers.DownloadPublicFile)
+	router.GET("/files/token/:token/:uuid/:filename", controllers.DownloadProtectedFile)
 
 	var v1 *gin.RouterGroup
 	if appconf.EnableAPIAuth {

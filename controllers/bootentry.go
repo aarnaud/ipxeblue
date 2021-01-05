@@ -127,6 +127,13 @@ func UpdateBootentry(c *gin.Context) {
 		return
 	}
 
+	for _, file := range bootentryUpdate.Files {
+		if *file.Templatized && !*file.Protected {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "templatized file has to be protected"})
+			return
+		}
+	}
+
 	result := db.Model(&bootentryUpdate).Preload("Files").Updates(bootentryUpdate)
 	if result.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Error{

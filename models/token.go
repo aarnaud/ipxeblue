@@ -6,11 +6,14 @@ import (
 )
 
 type Token struct {
-	Token         string        `gorm:"primaryKey" json:"token"`
-	ComputerUUID  uuid.UUID     `gorm:"not null" json:"computer_uuid"`
-	BootentryUUID uuid.UUID     `gorm:"not null" json:"bootentryfile_uuid"`
-	Filename      string        `gorm:"not null" json:"filename"`
-	BootentryFile BootentryFile `gorm:"ForeignKey:BootentryUUID,Filename;References:BootentryUUID,Name" json:"-"`
-	Computer      Computer      `gorm:"ForeignKey:ComputerUUID;References:Uuid,Name" json:"-"`
-	ExpireAt      time.Time     `json:"expire"`
+	Token         string    `gorm:"primaryKey" json:"token"`
+	Computer      Computer  `gorm:"ForeignKey:ComputerUUID;References:Uuid,Name" json:"-"`
+	ComputerUUID  uuid.UUID `gorm:"not null" json:"computer_uuid"`
+	Bootentry     Bootentry `gorm:"ForeignKey:BootentryUUID;References:Uuid,Name" json:"-"`
+	BootentryUUID uuid.UUID `gorm:"not null" json:"bootentry_uuid"`
+	// BootentryFile can be null if we generate DownloadBaseURL
+	BootentryFile     *BootentryFile `gorm:"ForeignKey:BootentryUUID,Filename;References:BootentryUUID,Name" json:"-"`
+	BootentryfileUUID *uuid.UUID     `json:"-"`
+	Filename          *string        `json:"filename"`
+	ExpireAt          time.Time      `json:"expire"`
 }

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"github.com/aarnaud/ipxeblue/utils/helpers"
 	"github.com/google/uuid"
 	"time"
 )
@@ -16,11 +18,23 @@ type Bootentry struct {
 	UpdatedAt   time.Time       `json:"updated_at"`
 }
 
-func (b *Bootentry) GetDownloadPath(filename string) string {
+func (b *Bootentry) GetFile(filename string) *BootentryFile {
 	for _, file := range b.Files {
 		if file.Name == filename {
-			return file.GetDownloadPath()
+			file.Bootentry = *b
+			return &file
 		}
 	}
-	return ""
+	return nil
+}
+
+func (b *Bootentry) GetDownloadBasePath() (string, *Token) {
+	token := Token{
+		Token:         helpers.RandomString(15),
+		Bootentry:     *b,
+		BootentryFile: nil,
+		// TODO: expose token duration in configuration
+		ExpireAt: time.Now().Add(time.Minute * 10),
+	}
+	return fmt.Sprintf("/files/token/%s/%s/", token.Token, b.Uuid), &token
 }

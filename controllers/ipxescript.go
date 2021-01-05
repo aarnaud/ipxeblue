@@ -84,6 +84,8 @@ func IpxeScript(c *gin.Context) {
 	}
 
 	computer := updateOrCreateComputer(c, id, mac, ip)
+	// Add computer in gin context to use it in template function
+	c.Set("computer", &computer)
 
 	c.Header("Content-Type", "text/plain; charset=utf-8")
 	bootentry := models.Bootentry{}
@@ -150,9 +152,7 @@ func IpxeScript(c *gin.Context) {
 	c.Data(http.StatusOK, "text/plain", writer.Bytes())
 }
 
-func DownloadFiles(c *gin.Context) {
-	filestore := c.MustGet("filestore").(*minio.Client)
-	config := c.MustGet("config").(*utils.Config)
+func DownloadPublicFile(c *gin.Context) {
 	filename := c.Param("filename")
 	id, err := uuid.Parse(c.Param("uuid"))
 	if err != nil {
@@ -166,6 +166,51 @@ func DownloadFiles(c *gin.Context) {
 		Name:          filename,
 		BootentryUUID: id,
 	}
+
+	downloadfile(c, &bootentryFile, nil)
+
+}
+
+func DownloadProtectedFile(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	filename := c.Param("filename")
+	tokenString := c.Param("token")
+	token := models.Token{}
+
+	db.Preload("Computer").
+		Preload("Bootentry").
+		Preload("Bootentry.Files").
+		Where("token = ?", tokenString).First(&token)
+
+	if token.BootentryFile != nil {
+		if *token.Filename != filename {
+			c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+				Error: fmt.Sprintf("filename not allow with this token"),
+			})
+			return
+		}
+	} else {
+		for _, file := range token.Bootentry.Files {
+			if file.Name == filename {
+				token.BootentryFile = &file
+				break
+			}
+		}
+		// if BootentryFile still null, return not found
+		if token.BootentryFile == nil {
+			c.AbortWithStatusJSON(http.StatusNotFound, models.Error{
+				Error: fmt.Sprintf("file not found"),
+			})
+			return
+		}
+	}
+
+	downloadfile(c, token.BootentryFile, &token.Computer)
+}
+
+func downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer *models.Computer) {
+	filestore := c.MustGet("filestore").(*minio.Client)
+	config := c.MustGet("config").(*utils.Config)
 
 	getObjectOptions := minio.GetObjectOptions{}
 	if byterange := c.Request.Header.Get("Range"); byterange != "" {

@@ -22,8 +22,13 @@ func (b *BootentryFile) GetAPIDownloadPath() string {
 	return fmt.Sprintf("/api/v1/bootentries/%s/files/%s", b.BootentryUUID.String(), b.Name)
 }
 
-func (b *BootentryFile) GetDownloadPath() string {
-	return fmt.Sprintf("/files/%s/%s", b.BootentryUUID.String(), b.Name)
+func (b *BootentryFile) GetDownloadPath() (string, *Token) {
+	basePath, token := b.Bootentry.GetDownloadBasePath()
+	if *b.Protected {
+		token.BootentryFile = b
+		return fmt.Sprintf("%s%s", basePath, b.Name), token
+	}
+	return fmt.Sprintf("/files/public/%s/%s", b.BootentryUUID.String(), b.Name), nil
 }
 
 // MarshalJSON initializes nil slices and then marshals the bag to JSON
