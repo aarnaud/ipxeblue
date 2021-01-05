@@ -624,6 +624,9 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
+                "persistent": {
+                    "type": "boolean"
+                },
                 "updated_at": {
                     "type": "string"
                 }

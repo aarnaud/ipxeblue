@@ -136,12 +136,14 @@ func IpxeScript(c *gin.Context) {
 			})
 			return
 		}
-		// reset bootentry
-		computer.BootentryUUID = uuid.Nil
-		db.Save(&computer)
-
 		// add failed goto that can be use in ipxescript
 		writer.Write([]byte("\n\n:failed\necho Booting failed, waiting 10 sec\nsleep 10\nexit 1"))
+	}
+
+	// reset bootentry if not persistent
+	if !*bootentry.Persistent {
+		computer.BootentryUUID = uuid.Nil
+		db.Save(&computer)
 	}
 
 	c.Data(http.StatusOK, "text/plain", writer.Bytes())

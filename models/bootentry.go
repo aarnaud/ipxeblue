@@ -7,8 +7,9 @@ import (
 
 type Bootentry struct {
 	Uuid        uuid.UUID       `gorm:"type:uuid;primaryKey" json:"id"`
-	Name        string          `json:"name"`
+	Name        string          `gorm:"uniqueIndex:idx_name" json:"name"`
 	Description string          `json:"description"`
+	Persistent  *bool           `gorm:"not null;default:FALSE" json:"persistent"`
 	IpxeScript  string          `json:"ipxe_script"`
 	Files       []BootentryFile `gorm:"foreignkey:bootentry_uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"files"`
 	Computers   []Computer      `gorm:"foreignkey:bootentry_uuid;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL"`

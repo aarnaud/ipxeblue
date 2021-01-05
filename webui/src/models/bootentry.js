@@ -14,13 +14,14 @@ import {
     SimpleForm,
     TextField,
     TextInput,
-    required, SimpleFormIterator, ArrayInput,
+    required, SimpleFormIterator, ArrayInput, BooleanField,
 } from 'react-admin';
 
 const BootentryFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Name" source="name" alwaysOn />
         <TextInput label="Description" source="description" alwaysOn />
+        <BooleanInput label="Description" source="description" alwaysOn />
     </Filter>
 );
 
@@ -30,6 +31,7 @@ export const BootentryList = props => (
             <TextField source="id" disabled />
             <TextField source="name" />
             <TextField source="description" />
+            <BooleanField source="persistent" />
             <DateField source="created_at" showTime={true} />
             <DateField source="updated_at" showTime={true} />
             <EditButton />
@@ -43,6 +45,7 @@ export const BootentryCreate = props => (
         <SimpleForm>
             <TextInput source="name" validate={[required()]} />
             <TextInput source="description" validate={[required()]} />
+            <BooleanInput source="persistent" />
             <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="ipxe_script" />
         </SimpleForm>
     </Create>
@@ -57,6 +60,7 @@ export const BootentryEdit = props => (
             <DateTimeInput source="updated_at" disabled />
             <TextInput source="name" validate={[required()]} />
             <TextInput source="description" validate={[required()]} />
+            <BooleanInput source="persistent" />
             <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="ipxe_script" />
             <ArrayInput source="files">
                 <SimpleFormIterator>
