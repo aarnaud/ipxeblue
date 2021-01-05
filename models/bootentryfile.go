@@ -11,6 +11,7 @@ type BootentryFile struct {
 	Protected     *bool     `gorm:"not null;default:FALSE" json:"protected"`
 	Templatized   *bool     `gorm:"not null;default:FALSE" json:"templatized"`
 	BootentryUUID uuid.UUID `gorm:"type:uuid;primaryKey;index" json:"-"`
+	Bootentry     Bootentry `gorm:"foreignkey:bootentry_uuid;References:Uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (b *BootentryFile) GetFileStorePath() string {

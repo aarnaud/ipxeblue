@@ -23,6 +23,7 @@ type Computer struct {
 	Version       string         `json:"version"`
 	Tags          []Tag          `gorm:"foreignkey:ComputerUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tags"`
 	BootentryUUID uuid.UUID      `gorm:"type:uuid" json:"bootentry_uuid"`
+	Bootentry     Bootentry      `gorm:"foreignkey:bootentry_uuid;References:Uuid;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 }

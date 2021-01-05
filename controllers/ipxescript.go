@@ -142,8 +142,9 @@ func IpxeScript(c *gin.Context) {
 
 	// reset bootentry if not persistent
 	if !*bootentry.Persistent {
-		computer.BootentryUUID = uuid.Nil
-		db.Save(&computer)
+		db.Model(&computer).Updates(map[string]interface{}{
+			"BootentryUUID": nil,
+		})
 	}
 
 	c.Data(http.StatusOK, "text/plain", writer.Bytes())

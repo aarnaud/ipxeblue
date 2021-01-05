@@ -582,12 +582,6 @@
         "models.Bootentry": {
             "type": "object",
             "properties": {
-                "computers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Computer"
-                    }
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -620,6 +614,9 @@
         "models.BootentryFile": {
             "type": "object",
             "properties": {
+                "bootentry": {
+                    "$ref": "#/definitions/models.Bootentry"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -636,6 +633,9 @@
             "properties": {
                 "asset": {
                     "type": "string"
+                },
+                "bootentry": {
+                    "$ref": "#/definitions/models.Bootentry"
                 },
                 "bootentry_uuid": {
                     "type": "string"

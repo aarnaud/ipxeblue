@@ -2,10 +2,6 @@ basePath: /api/v1
 definitions:
   models.Bootentry:
     properties:
-      computers:
-        items:
-          $ref: '#/definitions/models.Computer'
-        type: array
       created_at:
         type: string
       description:
@@ -27,6 +23,8 @@ definitions:
     type: object
   models.BootentryFile:
     properties:
+      bootentry:
+        $ref: '#/definitions/models.Bootentry'
       name:
         type: string
       protected:
@@ -38,6 +36,8 @@ definitions:
     properties:
       asset:
         type: string
+      bootentry:
+        $ref: '#/definitions/models.Bootentry'
       bootentry_uuid:
         type: string
       build_arch:
