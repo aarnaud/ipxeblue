@@ -60,5 +60,9 @@ func (c *Ipxeaccount) UnmarshalJSON(data []byte) error {
 		}
 		aux.Password = hash
 	}
+	falseRef := false
+	if c.IsAdmin == nil {
+		c.IsAdmin = &falseRef
+	}
 	return nil
 }

@@ -52,3 +52,24 @@ func (o BootentryFile) MarshalJSON() ([]byte, error) {
 		Alias: alias,
 	})
 }
+
+func (o *BootentryFile) UnmarshalJSON(data []byte) error {
+
+	type Alias BootentryFile
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(o),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	falseRef := false
+	if o.Protected == nil {
+		o.Protected = &falseRef
+	}
+	if o.Templatized == nil {
+		o.Protected = &falseRef
+	}
+	return nil
+}

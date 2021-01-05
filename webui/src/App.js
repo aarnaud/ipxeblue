@@ -19,6 +19,14 @@ const myDataProvider = {
             return dataProvider.update(resource, params);
         }
 
+        // remove file if fileobject is null
+        params.data.files = params.data.files.filter(file => {
+            if (file === undefined){
+                return false
+            }
+            return file.file !== null
+        })
+
         // set name from fileobject title
         params.data.files.map(file => {
             if (file.file) {
@@ -27,10 +35,6 @@ const myDataProvider = {
             return file
         })
 
-        // remove file if fileobject is null
-        params.data.files = params.data.files.filter(file => {
-            return file.file !== null
-        })
         // if rawfile exist it's new file, need to be upload
         const newFiles = params.data.files.filter(
             file => {

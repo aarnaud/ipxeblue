@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/aarnaud/ipxeblue/utils/helpers"
 	"github.com/google/uuid"
@@ -37,4 +38,21 @@ func (b *Bootentry) GetDownloadBasePath() (string, *Token) {
 		ExpireAt: time.Now().Add(time.Minute * 10),
 	}
 	return fmt.Sprintf("/files/token/%s/%s/", token.Token, b.Uuid), &token
+}
+
+func (o *Bootentry) UnmarshalJSON(data []byte) error {
+	type Alias Bootentry
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(o),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	falseRef := false
+	if o.Persistent == nil {
+		o.Persistent = &falseRef
+	}
+	return nil
 }

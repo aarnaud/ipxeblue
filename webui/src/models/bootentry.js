@@ -21,7 +21,7 @@ const BootentryFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Name" source="name" alwaysOn />
         <TextInput label="Description" source="description" alwaysOn />
-        <BooleanInput label="Description" source="description" alwaysOn />
+        <BooleanInput label="Persistent" source="persistent" alwaysOn />
     </Filter>
 );
 
