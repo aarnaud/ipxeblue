@@ -36,11 +36,9 @@ func Database() *gorm.DB {
 		panic("Failed to connect to database!")
 	}
 
-	err = db.AutoMigrate(&models.Computer{})
-	err = db.AutoMigrate(&models.Tag{})
-	err = db.AutoMigrate(&models.Ipxeaccount{})
-	err = db.AutoMigrate(&models.BootentryFile{})
-	err = db.AutoMigrate(&models.Bootentry{})
+	err = db.AutoMigrate(&models.Computer{}, &models.Tag{}, &models.Ipxeaccount{}, &models.Bootentry{},
+		&models.BootentryFile{}, &models.Token{})
+
 	if err != nil {
 		fmt.Println(err)
 		panic("Failed to migrate database!")
