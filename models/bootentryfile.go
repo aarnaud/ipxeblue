@@ -8,8 +8,8 @@ import (
 
 type BootentryFile struct {
 	Name          string    `gorm:"primaryKey;index" json:"name"`
-	Protected     *bool     `json:"protected"`
-	Templatized   *bool     `json:"templatized"`
+	Protected     *bool     `gorm:"not null;default:FALSE" json:"protected"`
+	Templatized   *bool     `gorm:"not null;default:FALSE" json:"templatized"`
 	BootentryUUID uuid.UUID `gorm:"type:uuid;primaryKey;index" json:"-"`
 }
 
