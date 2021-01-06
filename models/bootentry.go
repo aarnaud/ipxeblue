@@ -22,7 +22,7 @@ type Bootentry struct {
 func (b *Bootentry) GetFile(filename string) *BootentryFile {
 	for _, file := range b.Files {
 		if file.Name == filename {
-			file.Bootentry = *b
+			file.Bootentry = b
 			return &file
 		}
 	}

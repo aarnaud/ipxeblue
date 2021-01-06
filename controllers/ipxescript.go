@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pgtype"
 	"github.com/minio/minio-go/v7"
 	"gorm.io/gorm"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -178,6 +179,7 @@ func DownloadProtectedFile(c *gin.Context) {
 	token := models.Token{}
 
 	db.Preload("Computer").
+		Preload("Computer.Tags").
 		Preload("Bootentry").
 		Preload("Bootentry.Files").
 		Where("token = ?", tokenString).First(&token)
@@ -251,5 +253,33 @@ func downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer 
 	for header, value := range headers {
 		c.Header(header, value[0])
 	}
-	c.DataFromReader(200, objectFile.Size, objectFile.ContentType, reader, nil)
+
+	if *bootentryFile.Templatized && objectFile.Size < 2*1024*1024 {
+		// Create template name by the uuid
+		tpl := template.New(bootentryFile.Name)
+		// provide a func in the FuncMap which can access tpl to be able to look up templates
+		tpl.Funcs(utils.GetCustomFunctions(c, tpl))
+		buf := new(strings.Builder)
+		_, err := io.Copy(buf, reader)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, models.Error{
+				Error: err.Error(),
+			})
+			return
+		}
+		tpl, err = tpl.Parse(buf.String())
+		writer := bytes.NewBuffer([]byte{})
+		err = tpl.ExecuteTemplate(writer, bootentryFile.Name, gin.H{
+			"Bootentry": bootentryFile.Bootentry,
+			"Computer":  computer,
+		})
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, models.Error{
+				Error: err.Error(),
+			})
+		}
+		c.Data(http.StatusOK, objectFile.ContentType, writer.Bytes())
+	} else {
+		c.DataFromReader(http.StatusOK, objectFile.Size, objectFile.ContentType, reader, nil)
+	}
 }
