@@ -69,7 +69,7 @@ func (o *BootentryFile) UnmarshalJSON(data []byte) error {
 		o.Protected = &falseRef
 	}
 	if o.Templatized == nil {
-		o.Protected = &falseRef
+		o.Templatized = &falseRef
 	}
 	return nil
 }
