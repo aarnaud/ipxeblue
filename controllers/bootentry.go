@@ -231,7 +231,10 @@ func UploadBootentryFile(c *gin.Context) {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("get form err: %s", err.Error()))
+		fmt.Printf("get form err: %s\n", err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+			Error: fmt.Sprintf("get form err: %s", err.Error()),
+		})
 		return
 	}
 
@@ -242,13 +245,19 @@ func UploadBootentryFile(c *gin.Context) {
 	}
 	filereader, err := file.Open()
 	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("open file err: %s", err.Error()))
+		fmt.Printf("open file err: %s", err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+			Error: fmt.Sprintf("open file err: %s", err.Error()),
+		})
 		return
 	}
 	_, err = filestore.PutObject(context.Background(), config.MinioConfig.BucketName, bootentryfile.GetFileStorePath(),
 		filereader, file.Size, minio.PutObjectOptions{})
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+		fmt.Printf("upload file err: %s", err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+			Error: fmt.Sprintf("upload file err: %s", err.Error()),
+		})
 		return
 	}
 
