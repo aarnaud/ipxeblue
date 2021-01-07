@@ -101,6 +101,7 @@ func main() {
 	v1.PUT("/bootentries/:uuid", controllers.UpdateBootentry)
 	v1.DELETE("/bootentries/:uuid", controllers.DeleteBootentry)
 	v1.POST("/bootentries/:uuid/files/:name", controllers.UploadBootentryFile)
+	v1.GET("/bootentries/:uuid/files/:name", controllers.DownloadBootentryFile)
 
 	router.Run(fmt.Sprintf(":%d", appconf.Port))
 }

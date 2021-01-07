@@ -263,3 +263,30 @@ func UploadBootentryFile(c *gin.Context) {
 
 	c.JSON(http.StatusAccepted, struct{}{})
 }
+
+func DownloadBootentryFile(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	id := uuid.MustParse(c.Param("uuid"))
+	name := c.Param("name")
+	id, err := uuid.Parse(c.Param("uuid"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	bootentryFile := models.BootentryFile{
+		Name:          name,
+		BootentryUUID: id,
+	}
+	result := db.Model(&models.BootentryFile{}).Where("bootentry_uuid = ? AND name = ?", id, name).First(&bootentryFile)
+	if result.RowsAffected == 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound, models.Error{
+			Error: fmt.Sprintf("Bootentry with uuid %s not found", id),
+		})
+		return
+	}
+
+	Downloadfile(c, &bootentryFile, nil)
+}
