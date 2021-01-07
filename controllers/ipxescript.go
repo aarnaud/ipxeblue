@@ -154,6 +154,7 @@ func IpxeScript(c *gin.Context) {
 }
 
 func DownloadPublicFile(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
 	filename := c.Param("filename")
 	id, err := uuid.Parse(c.Param("uuid"))
 	if err != nil {
@@ -168,7 +169,16 @@ func DownloadPublicFile(c *gin.Context) {
 		BootentryUUID: id,
 	}
 
-	downloadfile(c, &bootentryFile, nil)
+	db.Model(&models.BootentryFile{}).Where("bootentry_uuid = ? AND name = ?", id, filename).First(&bootentryFile)
+
+	if *bootentryFile.Protected {
+		c.AbortWithStatusJSON(http.StatusForbidden, models.Error{
+			Error: fmt.Sprintf("protected file, you need to use a token URL"),
+		})
+		return
+	}
+
+	Downloadfile(c, &bootentryFile, nil)
 
 }
 
@@ -207,10 +217,10 @@ func DownloadProtectedFile(c *gin.Context) {
 		}
 	}
 
-	downloadfile(c, token.BootentryFile, &token.Computer)
+	Downloadfile(c, token.BootentryFile, &token.Computer)
 }
 
-func downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer *models.Computer) {
+func Downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer *models.Computer) {
 	filestore := c.MustGet("filestore").(*minio.Client)
 	config := c.MustGet("config").(*utils.Config)
 
