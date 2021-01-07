@@ -22,7 +22,7 @@ func Database() *gorm.DB {
 		DBhost := viper.GetString("DB_HOST")
 		DBport := viper.GetString("DB_PORT")
 		DBsslmode := viper.GetString("DB_SSLMODE")
-		databaseUrl = fmt.Sprintf("DATABASE_URL=postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		databaseUrl = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 			DBuser, DBpassword, DBhost, DBport, DBname, DBsslmode)
 	} else {
 		databaseUrl = viperDBUrl
