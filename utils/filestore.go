@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"log"
+	"github.com/rs/zerolog/log"
 )
 
 func NewFileStore(config *Config) *minio.Client {
@@ -15,19 +15,19 @@ func NewFileStore(config *Config) *minio.Client {
 		Secure: config.MinioConfig.Secure,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err)
 	}
 
 	exist, err := minioClient.BucketExists(ctx, config.MinioConfig.BucketName)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err)
 	}
 
 	if !exist {
-		log.Printf("creating bukcet %s \n", config.MinioConfig.BucketName)
+		log.Info().Msgf("creating bukcet %s \n", config.MinioConfig.BucketName)
 		err := minioClient.MakeBucket(ctx, config.MinioConfig.BucketName, minio.MakeBucketOptions{})
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal().Err(err)
 		}
 	}
 	return minioClient
@@ -45,7 +45,7 @@ func RemoveRecursive(client *minio.Client, bucketName string, prefix string) err
 			Prefix:    prefix,
 		}) {
 			if objectInfo.Err != nil {
-				log.Println(objectInfo.Err.Error())
+				log.Error().Err(objectInfo.Err).Msg("failed to list objects to remove")
 			}
 			objectsCh <- objectInfo
 		}

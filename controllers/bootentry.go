@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 	"net/http"
 	"path/filepath"
@@ -231,7 +232,7 @@ func UploadBootentryFile(c *gin.Context) {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		fmt.Printf("get form err: %s\n", err.Error())
+		log.Error().Err(err).Msg("failed to read form")
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
 			Error: fmt.Sprintf("get form err: %s", err.Error()),
 		})
@@ -245,7 +246,7 @@ func UploadBootentryFile(c *gin.Context) {
 	}
 	filereader, err := file.Open()
 	if err != nil {
-		fmt.Printf("open file err: %s", err.Error())
+		log.Error().Err(err).Msg("failed to open file in form")
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
 			Error: fmt.Sprintf("open file err: %s", err.Error()),
 		})
@@ -254,7 +255,7 @@ func UploadBootentryFile(c *gin.Context) {
 	_, err = filestore.PutObject(context.Background(), config.MinioConfig.BucketName, bootentryfile.GetFileStorePath(),
 		filereader, file.Size, minio.PutObjectOptions{})
 	if err != nil {
-		fmt.Printf("upload file err: %s", err.Error())
+		log.Error().Err(err).Msg("failed to upload file to storage backend")
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
 			Error: fmt.Sprintf("upload file err: %s", err.Error()),
 		})

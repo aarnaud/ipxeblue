@@ -7,7 +7,10 @@ import (
 	"github.com/aarnaud/ipxeblue/midlewares"
 	"github.com/aarnaud/ipxeblue/utils"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"time"
@@ -24,9 +27,11 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	appconf := utils.GetConfig()
 
 	router := gin.Default()
+	router.Use(logger.SetLogger())
 
 	// CORS for https://foo.com and https://github.com origins, allowing:
 	// - PUT and PATCH methods
@@ -45,7 +50,7 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	db := utils.Database()
 	filestore := utils.NewFileStore(appconf)
-	fmt.Println("start TokenCleaner")
+	log.Info().Msg("starting TokenCleaner in goroutine")
 	go utils.TokenCleaner(db)
 
 	// Provide db variable to controllers
@@ -57,6 +62,7 @@ func main() {
 	})
 
 	if gin.Mode() == gin.DebugMode {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		// Configure SwaggerUI
 		url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/aarnaud/ipxeblue/models"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,16 +33,14 @@ func Database() *gorm.DB {
 		DSN: databaseUrl,
 	}), &gorm.Config{})
 	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database!")
+		log.Panic().Err(err).Msg("failed to connect to database!")
 	}
 
 	err = db.AutoMigrate(&models.Computer{}, &models.Tag{}, &models.Ipxeaccount{}, &models.Bootentry{},
 		&models.BootentryFile{}, &models.Token{})
 
 	if err != nil {
-		fmt.Println(err)
-		panic("Failed to migrate database!")
+		log.Panic().Err(err).Msg("failed to automigrate database!")
 	}
 	return db
 }
