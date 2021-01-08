@@ -9,6 +9,21 @@ import ComputerIcon from '@material-ui/icons/Computer';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
+import { createMuiTheme } from '@material-ui/core/styles';
+import blueGrey from '@material-ui/core/colors/blueGrey';
+import lightBlue from '@material-ui/core/colors/lightBlue';
+const theme = createMuiTheme({
+    typography: {
+        fontSize: 12,
+    },
+    palette: {
+        primary: lightBlue,
+        secondary: blueGrey,
+        type: 'dark', // Switching the dark mode on is a single property value change.
+    },
+});
+
+
 const apiUrl = '/api/v1';
 const dataProvider = jsonServerProvider(apiUrl);
 const myDataProvider = {
@@ -68,7 +83,7 @@ const fileUpload = (file, url) => {
 
 
 const App = () => (
-    <Admin dataProvider={myDataProvider}>
+    <Admin dataProvider={myDataProvider} theme={theme}>
         <Resource name="computers" icon={ComputerIcon} list={ComputerList} edit={ComputerEdit}/>
         <Resource name="ipxeaccounts" options={{ label: 'iPXE accounts' }} icon={VpnKeyIcon} list={IpxeaccountList} edit={IpxeaccountEdit} create={IpxeaccountCreate}/>
         <Resource name="bootentries" options={{ label: 'Boot entries' }} icon={AssignmentIcon} list={BootentryList} edit={BootentryEdit} create={BootentryCreate}/>

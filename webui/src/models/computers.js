@@ -1,9 +1,12 @@
 import * as React from "react";
 import {
+    ArrayField,
     ArrayInput,
+    ChipField,
     Datagrid,
     DateField,
     DateTimeInput,
+    DeleteButton,
     Edit,
     EditButton,
     Filter,
@@ -11,6 +14,7 @@ import {
     SelectInput,
     SimpleForm,
     SimpleFormIterator,
+    SingleFieldList,
     ReferenceInput,
     ReferenceField,
     TextField,
@@ -24,8 +28,8 @@ const ComputerFilter = (props) => (
         <TextInput label="name" source="name" alwaysOn />
         <TextInput label="MAC" source="mac" alwaysOn />
         <TextInput label="IP" source="ip" alwaysOn />
-        <TextInput label="Manufacturer" source="manufacturer" alwaysOn />
-        <TextInput label="Product" source="product" alwaysOn />
+        <TextInput label="Manufacturer" source="manufacturer" allowEmpty />
+        <TextInput label="Product" source="product" allowEmpty />
         <TextInput label="Serial" source="serial" alwaysOn />
         <TextInput label="Build Arch" source="build_arch" allowEmpty />
         <TextInput label="Platform" source="platform" allowEmpty />
@@ -39,7 +43,6 @@ export const ComputerList = props => (
     <List filters={<ComputerFilter />} {...props}>
         <Datagrid>
             <TextField source="name" />
-            <TextField source="id" />
             <TextField source="mac" />
             <TextField source="ip" />
             <TextField source="hostname" />
@@ -53,7 +56,13 @@ export const ComputerList = props => (
             <ReferenceField label="Bootentry" source="bootentry_uuid" reference="bootentries">
                 <TextField source="name" />
             </ReferenceField>
+            <ArrayField source="tags">
+                <SingleFieldList linkType={false}>
+                    <ChipField source="value" label="value"  />
+                </SingleFieldList>
+            </ArrayField>
             <EditButton />
+            <DeleteButton />
         </Datagrid>
     </List>
 );
@@ -66,6 +75,12 @@ export const ComputerEdit = props => (
             <ReferenceInput label="Bootentry" source="bootentry_uuid" allowEmpty={true} reference="bootentries">
                 <SelectInput optionText="description" />
             </ReferenceInput>
+            <ArrayInput source="tags">
+                <SimpleFormIterator>
+                    <TextInput source="key" label="key" validate={[required()]} />
+                    <TextInput source="value" label="value" />
+                </SimpleFormIterator>
+            </ArrayInput>
             <TextInput source="id" disabled />
             <TextInput source="mac" disabled />
             <TextInput source="ip" disabled />
@@ -81,12 +96,6 @@ export const ComputerEdit = props => (
             <DateTimeInput source="last_login" disabled />
             <DateTimeInput source="created_at" disabled />
             <DateTimeInput source="updated_at" disabled />
-            <ArrayInput source="tags">
-                <SimpleFormIterator>
-                    <TextInput source="key" label="key" validate={[required()]} />
-                    <TextInput source="value" label="value" />
-                </SimpleFormIterator>
-            </ArrayInput>
         </SimpleForm>
     </Edit>
 );
