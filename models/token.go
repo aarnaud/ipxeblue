@@ -14,5 +14,5 @@ type Token struct {
 	// BootentryFile can be null if we generate DownloadBaseURL
 	BootentryFile *BootentryFile `gorm:"ForeignKey:BootentryUUID,Filename;References:BootentryUUID,Name;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Filename      *string        `json:"filename"`
-	ExpireAt      time.Time      `json:"expire"`
+	ExpireAt      time.Time      `gorm:"index:idx_expire_at" json:"expire"`
 }

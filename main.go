@@ -45,6 +45,8 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	db := utils.Database()
 	filestore := utils.NewFileStore(appconf)
+	fmt.Println("start TokenCleaner")
+	go utils.TokenCleaner(db)
 
 	// Provide db variable to controllers
 	router.Use(func(c *gin.Context) {
