@@ -1,0 +1,25 @@
+#!ipxe
+echo loading ipxe from {{ .BaseURL }}
+isset ${username} || goto menu
+isset ${password} || goto menu
+
+:bootipxe
+chain {{ .Scheme }}://${username:uristring}:${password:uristring}@{{ .Host }}/?asset=${asset}&buildarch=${buildarch}&hostname=${hostname}&mac=${mac:hexhyp}&ip=${ip}&manufacturer=${manufacturer}&platform=${platform}&product=${product}&serial=${serial}&uuid=${uuid}&version=${version} || goto failed
+
+:menu
+menu Username or Password not set
+item login  Enter Username/Password
+item exit   Exit to continue boot on computer disk
+choose --default exit --timeout 5000 target && goto ${target}
+
+:login
+login
+goto bootipxe
+
+:failed
+echo Boot failed, waiting 5 sec
+sleep 5
+exit 1
+
+:exit
+exit 1

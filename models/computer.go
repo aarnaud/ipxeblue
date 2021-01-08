@@ -8,24 +8,26 @@ import (
 )
 
 type Computer struct {
-	Uuid          uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
-	Mac           pgtype.Macaddr `gorm:"type:macaddr;index:idx_mac" json:"-"`
-	IP            pgtype.Inet    `gorm:"type:inet;index:idx_ip" json:"-"`
-	Asset         string         `json:"asset"`
-	BuildArch     string         `json:"build_arch"`
-	Hostname      string         `json:"hostname"`
-	LastSeen      time.Time      `json:"last_seen"`
-	Manufacturer  string         `json:"manufacturer"`
-	Name          string         `json:"name"`
-	Platform      string         `json:"platform"`
-	Product       string         `json:"product"`
-	Serial        string         `json:"serial"`
-	Version       string         `json:"version"`
-	Tags          []Tag          `gorm:"foreignkey:ComputerUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tags"`
-	BootentryUUID *uuid.UUID     `gorm:"type:uuid" json:"bootentry_uuid"`
-	Bootentry     *Bootentry     `gorm:"foreignkey:bootentry_uuid;References:Uuid;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
+	Uuid              uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
+	Mac               pgtype.Macaddr `gorm:"type:macaddr;index:idx_mac" json:"-"`
+	IP                pgtype.Inet    `gorm:"type:inet;index:idx_ip" json:"-"`
+	Asset             string         `json:"asset"`
+	BuildArch         string         `json:"build_arch"`
+	Hostname          string         `json:"hostname"`
+	LastSeen          time.Time      `json:"last_seen"`
+	Manufacturer      string         `json:"manufacturer"`
+	Name              string         `json:"name"`
+	Platform          string         `json:"platform"`
+	Product           string         `json:"product"`
+	Serial            string         `json:"serial"`
+	Version           string         `json:"version"`
+	Tags              []Tag          `gorm:"foreignkey:ComputerUUID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tags"`
+	BootentryUUID     *uuid.UUID     `gorm:"type:uuid" json:"bootentry_uuid"`
+	Bootentry         *Bootentry     `gorm:"foreignkey:bootentry_uuid;References:Uuid;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL"`
+	LastIpxeaccountID string         `json:"last_ipxeaccount"`
+	LastIpxeaccount   *Ipxeaccount   `gorm:"foreignkey:last_ipxeaccount_id;References:Username;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL" json:"-"`
+	CreatedAt         time.Time      `json:"created_at"`
+	UpdatedAt         time.Time      `json:"updated_at"`
 }
 
 // MarshalJSON initializes nil slices and then marshals the bag to JSON

@@ -15,6 +15,10 @@ import (
 func BasicAuthIpxeAccount(onlyAdmin bool) gin.HandlerFunc {
 	realm := "Basic realm=" + strconv.Quote("Authorization Required")
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/" && len(c.Request.URL.Query()) == 0 {
+			// No authentication require
+			return
+		}
 		db := c.MustGet("db").(*gorm.DB)
 
 		auth := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
@@ -57,5 +61,6 @@ func BasicAuthIpxeAccount(onlyAdmin bool) gin.HandlerFunc {
 			account.LastLogin = time.Now()
 			db.Model(&account).Updates(account)
 		}
+		c.Set("account", &account)
 	}
 }

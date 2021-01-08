@@ -23,18 +23,19 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 	db := c.MustGet("db").(*gorm.DB)
 
 	computer := models.Computer{
-		Asset:        c.DefaultQuery("asset", ""),
-		BuildArch:    c.DefaultQuery("buildarch", ""),
-		Hostname:     c.DefaultQuery("hostname", ""),
-		LastSeen:     time.Now(),
-		Mac:          mac,
-		IP:           ip,
-		Manufacturer: c.DefaultQuery("manufacturer", ""),
-		Platform:     c.DefaultQuery("platform", ""),
-		Product:      c.DefaultQuery("product", ""),
-		Serial:       c.DefaultQuery("serial", ""),
-		Uuid:         id,
-		Version:      c.DefaultQuery("version", ""),
+		Asset:             c.DefaultQuery("asset", ""),
+		BuildArch:         c.DefaultQuery("buildarch", ""),
+		Hostname:          c.DefaultQuery("hostname", ""),
+		LastSeen:          time.Now(),
+		Mac:               mac,
+		IP:                ip,
+		Manufacturer:      c.DefaultQuery("manufacturer", ""),
+		Platform:          c.DefaultQuery("platform", ""),
+		Product:           c.DefaultQuery("product", ""),
+		Serial:            c.DefaultQuery("serial", ""),
+		Uuid:              id,
+		Version:           c.DefaultQuery("version", ""),
+		LastIpxeaccountID: c.MustGet("account").(*models.Ipxeaccount).Username,
 	}
 	db.FirstOrCreate(&computer)
 	if time.Now().Sub(computer.LastSeen).Seconds() > 10 {
@@ -50,6 +51,7 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 		computer.Product = c.DefaultQuery("product", "")
 		computer.Serial = c.DefaultQuery("serial", "")
 		computer.Version = c.DefaultQuery("version", "")
+		computer.LastIpxeaccountID = c.MustGet("account").(*models.Ipxeaccount).Username
 		db.Save(computer)
 	}
 
@@ -57,6 +59,21 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 }
 
 func IpxeScript(c *gin.Context) {
+	config := c.MustGet("config").(*utils.Config)
+	// basic check or reply with ipxe chain
+	_, uuidExist := c.GetQuery("uuid")
+	_, macExist := c.GetQuery("mac")
+	_, macIp := c.GetQuery("ip")
+	if !uuidExist || !macExist || !macIp {
+		c.HTML(http.StatusOK, "index.gohtml", gin.H{
+			"BaseURL": config.BaseURL.String(),
+			"Scheme":  config.BaseURL.Scheme,
+			"Host":    config.BaseURL.Host,
+		})
+		return
+	}
+
+	// process query params
 	db := c.MustGet("db").(*gorm.DB)
 	id, err := uuid.Parse(c.Query("uuid"))
 	if err != nil {

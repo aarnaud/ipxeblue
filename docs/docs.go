@@ -667,6 +667,9 @@ var doc = `{
                 "id": {
                     "type": "string"
                 },
+                "last_ipxeaccount": {
+                    "type": "string"
+                },
                 "last_seen": {
                     "type": "string"
                 },

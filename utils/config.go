@@ -1,6 +1,10 @@
 package utils
 
-import "github.com/spf13/viper"
+import (
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+	"net/url"
+)
 
 type MinioConfig struct {
 	Endpoint   string
@@ -14,7 +18,7 @@ type Config struct {
 	Port          int
 	EnableAPIAuth bool
 	MinioConfig   MinioConfig
-	BaseURL       string
+	BaseURL       *url.URL
 }
 
 func GetConfig() *Config {
@@ -28,7 +32,6 @@ func GetConfig() *Config {
 			Endpoint:   "127.0.0.1:9000",
 			BucketName: "ipxeblue",
 		},
-		BaseURL: "http://127.0.0.1:8080",
 	}
 
 	if p := viper.GetInt("PORT"); p != 0 {
@@ -51,9 +54,16 @@ func GetConfig() *Config {
 		config.EnableAPIAuth = viper.GetBool("ENABLE_API_AUTH")
 	}
 
+	BaseURL := "http://127.0.0.1:8080"
 	if value := viper.GetString("BASE_URL"); value != "" {
-		config.BaseURL = value
+		BaseURL = value
 	}
+
+	u, err := url.Parse(BaseURL)
+	if err != nil {
+		log.Panic().Err(err).Msg("failed to parse BASE_URL")
+	}
+	config.BaseURL = u
 
 	return &config
 }

@@ -21,7 +21,7 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 			return
 		},
 		"GetBaseURL": func() (ret string, err error) {
-			return config.BaseURL, nil
+			return config.BaseURL.String(), nil
 		},
 		"GetDownloadURL": func(bootentry models.Bootentry, filename string) (ret string, err error) {
 			file := bootentry.GetFile(filename)

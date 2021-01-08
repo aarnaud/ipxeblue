@@ -93,7 +93,9 @@ export const ComputerEdit = props => (
             <TextInput source="serial" disabled />
             <TextInput source="asset" disabled />
             <TextInput source="version" disabled />
-            <DateTimeInput source="last_login" disabled />
+            <ReferenceInput label="Last iPXE account logged" source="last_ipxeaccount" allowEmpty={true} reference="ipxeaccounts" disabled>
+                <SelectInput optionText="username" />
+            </ReferenceInput>
             <DateTimeInput source="created_at" disabled />
             <DateTimeInput source="updated_at" disabled />
         </SimpleForm>
