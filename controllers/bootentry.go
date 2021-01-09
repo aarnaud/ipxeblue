@@ -288,6 +288,8 @@ func DownloadBootentryFile(c *gin.Context) {
 		})
 		return
 	}
-
+	// disable template when download from API
+	falseRef := false
+	bootentryFile.Templatized = &falseRef
 	Downloadfile(c, &bootentryFile, nil)
 }

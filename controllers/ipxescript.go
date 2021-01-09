@@ -305,6 +305,8 @@ func Downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer 
 				Error: err.Error(),
 			})
 		}
+		// override Content-Length with size after template is render
+		c.Header("Content-Length", fmt.Sprintf("%d", writer.Len()))
 		c.Data(http.StatusOK, objectFile.ContentType, writer.Bytes())
 	} else {
 		c.DataFromReader(http.StatusOK, objectFile.Size, objectFile.ContentType, reader, nil)
