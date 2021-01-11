@@ -63,8 +63,8 @@ func IpxeScript(c *gin.Context) {
 	// basic check or reply with ipxe chain
 	_, uuidExist := c.GetQuery("uuid")
 	_, macExist := c.GetQuery("mac")
-	_, macIp := c.GetQuery("ip")
-	if !uuidExist || !macExist || !macIp {
+	_, ipExist := c.GetQuery("ip")
+	if !uuidExist || !macExist || !ipExist {
 		c.HTML(http.StatusOK, "index.gohtml", gin.H{
 			"BaseURL": config.BaseURL.String(),
 			"Scheme":  config.BaseURL.Scheme,
@@ -279,6 +279,11 @@ func Downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer 
 
 	for header, value := range headers {
 		c.Header(header, value[0])
+	}
+
+	if c.Request.Method == "HEAD" {
+		c.Done()
+		return
 	}
 
 	if *bootentryFile.Templatized && objectFile.Size < 2*1024*1024 {

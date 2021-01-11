@@ -77,7 +77,9 @@ func main() {
 	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))
 	ipxeroute.GET("/", controllers.IpxeScript)
 
+	router.HEAD("/files/public/:uuid/:filename", controllers.DownloadPublicFile)
 	router.GET("/files/public/:uuid/:filename", controllers.DownloadPublicFile)
+	router.HEAD("/files/token/:token/:uuid/:filename", controllers.DownloadProtectedFile)
 	router.GET("/files/token/:token/:uuid/:filename", controllers.DownloadProtectedFile)
 
 	var v1 *gin.RouterGroup
