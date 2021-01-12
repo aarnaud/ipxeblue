@@ -13,6 +13,12 @@ import (
 func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap {
 	config := c.MustGet("config").(*Config)
 	db := c.MustGet("db").(*gorm.DB)
+	baseURL := *config.BaseURL
+
+	// use the same scheme from request to generate URL
+	if schem := c.Request.Header.Get("X-Forwarded-Proto"); schem != "" {
+		baseURL.Scheme = schem
+	}
 	return map[string]interface{}{
 		"BootentryTemplate": func(name uuid.UUID, data interface{}) (ret string, err error) {
 			buf := bytes.NewBuffer([]byte{})
@@ -21,7 +27,7 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 			return
 		},
 		"GetBaseURL": func() (ret string, err error) {
-			return config.BaseURL.String(), nil
+			return baseURL.String(), nil
 		},
 		"GetDownloadURL": func(bootentry models.Bootentry, filename string) (ret string, err error) {
 			file := bootentry.GetFile(filename)
@@ -34,7 +40,7 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 				token.Computer = *c.MustGet("computer").(*models.Computer)
 				db.Create(&token)
 			}
-			return fmt.Sprintf("%s%s", config.BaseURL, path), err
+			return fmt.Sprintf("%s%s", baseURL.String(), path), err
 		},
 		"GetDownloadBaseURL": func(bootentry models.Bootentry) (ret string, err error) {
 			path, token := bootentry.GetDownloadBasePath()
@@ -43,7 +49,7 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 				token.Computer = *c.MustGet("computer").(*models.Computer)
 				db.Create(&token)
 			}
-			return fmt.Sprintf("%s%s", config.BaseURL, path), err
+			return fmt.Sprintf("%s%s", baseURL.String(), path), err
 		},
 	}
 }

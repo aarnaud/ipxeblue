@@ -65,6 +65,11 @@ func IpxeScript(c *gin.Context) {
 	_, macExist := c.GetQuery("mac")
 	_, ipExist := c.GetQuery("ip")
 	if !uuidExist || !macExist || !ipExist {
+		baseURL := *config.BaseURL
+		// use the same scheme from request to generate URL
+		if schem := c.Request.Header.Get("X-Forwarded-Proto"); schem != "" {
+			baseURL.Scheme = schem
+		}
 		c.HTML(http.StatusOK, "index.gohtml", gin.H{
 			"BaseURL": config.BaseURL.String(),
 			"Scheme":  config.BaseURL.Scheme,
