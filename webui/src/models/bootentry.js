@@ -26,7 +26,7 @@ const BootentryFilter = (props) => (
 );
 
 export const BootentryList = props => (
-    <List filters={<BootentryFilter />} {...props}>
+    <List filters={<BootentryFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="id" disabled />
             <TextField source="name" />

@@ -40,7 +40,7 @@ const ComputerFilter = (props) => (
 );
 
 export const ComputerList = props => (
-    <List filters={<ComputerFilter />} {...props}>
+    <List filters={<ComputerFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="mac" />

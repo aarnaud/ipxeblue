@@ -25,7 +25,7 @@ const IpxeaccountFilter = (props) => (
 );
 
 export const IpxeaccountList = props => (
-    <List filters={<IpxeaccountFilter />} {...props}>
+    <List filters={<IpxeaccountFilter />} sort={{ field: 'username', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="username" />
             <BooleanField source="is_admin" />
