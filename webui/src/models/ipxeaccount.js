@@ -10,12 +10,14 @@ import {
     EditButton,
     Filter,
     List,
+    Pagination,
     SimpleForm,
     TextField,
     TextInput,
     required,
 } from 'react-admin';
 
+const PostPagination = props => <Pagination rowsPerPageOptions={[15, 30, 50, 100, 200]} {...props} />;
 
 const IpxeaccountFilter = (props) => (
     <Filter {...props}>
@@ -25,7 +27,7 @@ const IpxeaccountFilter = (props) => (
 );
 
 export const IpxeaccountList = props => (
-    <List filters={<IpxeaccountFilter />} sort={{ field: 'username', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} filters={<IpxeaccountFilter />} sort={{ field: 'username', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="username" />
             <BooleanField source="is_admin" />

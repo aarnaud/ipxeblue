@@ -1,5 +1,7 @@
 import * as React from "react";
 import {
+    ArrayInput,
+    BooleanField,
     BooleanInput,
     Create,
     Datagrid,
@@ -11,11 +13,15 @@ import {
     FileInput,
     Filter,
     List,
+    Pagination,
     SimpleForm,
+    SimpleFormIterator,
     TextField,
     TextInput,
-    required, SimpleFormIterator, ArrayInput, BooleanField,
+    required,
 } from 'react-admin';
+
+const PostPagination = props => <Pagination rowsPerPageOptions={[15, 30, 50, 100, 200]} {...props} />;
 
 const BootentryFilter = (props) => (
     <Filter {...props}>
@@ -26,7 +32,7 @@ const BootentryFilter = (props) => (
 );
 
 export const BootentryList = props => (
-    <List filters={<BootentryFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} filters={<BootentryFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="id" disabled />
             <TextField source="name" />

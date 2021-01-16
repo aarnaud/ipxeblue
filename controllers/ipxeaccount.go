@@ -19,10 +19,14 @@ import (
 // @Router /ipxeaccount [get]
 func ListIpxeaccount(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
+
+	var total int64
+	db.Model(&models.Ipxeaccount{}).Count(&total)
+	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
+
 	logins := make([]models.Ipxeaccount, 0)
 	db = ListFilter(db, c)
 	db.Find(&logins)
-	c.Header("X-Total-Count", strconv.Itoa(len(logins)))
 	c.JSON(http.StatusOK, logins)
 }
 

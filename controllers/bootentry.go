@@ -25,10 +25,14 @@ import (
 // @Router /bootentries [get]
 func ListBootentries(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
+
+	var total int64
+	db.Model(&models.Bootentry{}).Count(&total)
+	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
+
 	bootentries := make([]models.Bootentry, 0)
 	db = ListFilter(db, c)
 	db.Preload("Files").Find(&bootentries)
-	c.Header("X-Total-Count", strconv.Itoa(len(bootentries)))
 	c.JSON(http.StatusOK, bootentries)
 }
 

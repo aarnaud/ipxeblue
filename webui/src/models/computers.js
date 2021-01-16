@@ -11,17 +11,19 @@ import {
     EditButton,
     Filter,
     List,
+    Pagination,
+    ReferenceField,
+    ReferenceInput,
     SelectInput,
     SimpleForm,
     SimpleFormIterator,
     SingleFieldList,
-    ReferenceInput,
-    ReferenceField,
     TextField,
     TextInput,
     required,
 } from 'react-admin';
 
+const PostPagination = props => <Pagination rowsPerPageOptions={[15, 30, 50, 100, 200]} {...props} />;
 
 const ComputerFilter = (props) => (
     <Filter {...props}>
@@ -40,12 +42,11 @@ const ComputerFilter = (props) => (
 );
 
 export const ComputerList = props => (
-    <List filters={<ComputerFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} filters={<ComputerFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="mac" />
             <TextField source="ip" />
-            <TextField source="hostname" />
             <DateField source="last_seen" showTime={true} />
             <TextField source="platform" />
             <TextField source="build_arch" />

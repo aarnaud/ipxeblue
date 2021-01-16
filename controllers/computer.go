@@ -20,10 +20,14 @@ import (
 // @Router /computers [get]
 func ListComputers(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
+
+	var total int64
+	db.Model(&models.Computer{}).Count(&total)
+	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
+
 	computers := make([]models.Computer, 0)
 	db = ListFilter(db, c)
 	db.Preload("Tags").Find(&computers)
-	c.Header("X-Total-Count", strconv.Itoa(len(computers)))
 	c.JSON(http.StatusOK, computers)
 }
 
