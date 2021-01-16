@@ -22,7 +22,14 @@ import (
 func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip pgtype.Inet) models.Computer {
 	db := c.MustGet("db").(*gorm.DB)
 
+	// auto set name based on hostname or asset for new computer
+	name := c.DefaultQuery("hostname", "")
+	if name == "" {
+		name = c.DefaultQuery("asset", "")
+	}
+
 	computer := models.Computer{
+		Name:              name,
 		Asset:             c.DefaultQuery("asset", ""),
 		BuildArch:         c.DefaultQuery("buildarch", ""),
 		Hostname:          c.DefaultQuery("hostname", ""),
