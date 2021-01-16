@@ -48,8 +48,6 @@ export const ComputerList = props => (
             <TextField source="mac" />
             <TextField source="ip" />
             <DateField source="last_seen" showTime={true} />
-            <TextField source="platform" />
-            <TextField source="build_arch" />
             <TextField source="manufacturer" />
             <TextField source="product" />
             <TextField source="serial" />
