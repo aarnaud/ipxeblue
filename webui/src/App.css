@@ -3,5 +3,18 @@
 }
 
 .ra-input-files .ra-input {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.ra-input-files .ra-input:last-child {
+  padding-left: 40px;
+}
+
+.ra-input-files .ra-input:last-child .MuiFormHelperText-root{
+  display: none;
+}
+
+.ra-input-files .ra-input:last-child div div{
   display: inline-block;
 }

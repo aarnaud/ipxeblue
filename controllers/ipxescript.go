@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 	"text/template"
@@ -184,7 +185,9 @@ func IpxeScript(c *gin.Context) {
 
 func DownloadPublicFile(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	filename := c.Param("filename")
+	filepath := c.Param("filepath")
+	filename := path.Base(filepath)
+	subpath := strings.TrimLeft(path.Dir(filepath), "/")
 	id, err := uuid.Parse(c.Param("uuid"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
@@ -195,6 +198,7 @@ func DownloadPublicFile(c *gin.Context) {
 
 	bootentryFile := models.BootentryFile{
 		Name:          filename,
+		SubPath:       subpath,
 		BootentryUUID: id,
 	}
 
@@ -213,7 +217,9 @@ func DownloadPublicFile(c *gin.Context) {
 
 func DownloadProtectedFile(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	filename := c.Param("filename")
+	filepath := c.Param("filepath")
+	filename := path.Base(filepath)
+	subpath := strings.TrimLeft(path.Dir(filepath), "/")
 	tokenString := c.Param("token")
 	token := models.Token{}
 
@@ -232,7 +238,7 @@ func DownloadProtectedFile(c *gin.Context) {
 		}
 	} else {
 		for _, file := range token.Bootentry.Files {
-			if file.Name == filename {
+			if file.Name == filename && file.SubPath == subpath {
 				token.BootentryFile = &file
 				token.BootentryFile.Bootentry = &token.Bootentry
 				c.Set("computer", &token.Computer)

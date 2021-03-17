@@ -72,6 +72,7 @@ export const BootentryEdit = props => (
                 <SimpleFormIterator>
                     <BooleanInput source="protected" label="Protected" />
                     <BooleanInput source="templatized" label="Templatized" />
+                    <TextInput source="subpath" label="Sub Path" />
                     <FileInput source="file" label="File" placeholder="click to select file to upload" options={{noDrag: true, maxFiles: 1, multiple: false}}>
                         <FileField source="src" title="title" />
                     </FileInput>
