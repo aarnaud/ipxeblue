@@ -234,6 +234,8 @@ func DownloadProtectedFile(c *gin.Context) {
 		for _, file := range token.Bootentry.Files {
 			if file.Name == filename {
 				token.BootentryFile = &file
+				token.BootentryFile.Bootentry = &token.Bootentry
+				c.Set("computer", &token.Computer)
 				break
 			}
 		}
@@ -289,7 +291,12 @@ func Downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer 
 		return
 	}
 
+	isTemplate := *bootentryFile.Templatized && objectFile.Size < 2*1024*1024
+
 	for header, value := range headers {
+		if header == "Content-Length" && isTemplate {
+			continue
+		}
 		c.Header(header, value[0])
 	}
 
@@ -298,7 +305,7 @@ func Downloadfile(c *gin.Context, bootentryFile *models.BootentryFile, computer 
 		return
 	}
 
-	if *bootentryFile.Templatized && objectFile.Size < 2*1024*1024 {
+	if isTemplate {
 		// Create template name by the uuid
 		tpl := template.New(bootentryFile.Name)
 		// provide a func in the FuncMap which can access tpl to be able to look up templates
