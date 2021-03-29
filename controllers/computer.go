@@ -85,7 +85,7 @@ func UpdateComputer(c *gin.Context) {
 		return
 	}
 
-	result := db.Model(&computerUpdate).Preload("Tags").Updates(map[string]interface{}{
+	result := db.Session(&gorm.Session{FullSaveAssociations: true}).Model(&computerUpdate).Updates(map[string]interface{}{
 		"Name":          computerUpdate.Name,
 		"Tags":          computerUpdate.Tags,
 		"BootentryUUID": computerUpdate.BootentryUUID,
