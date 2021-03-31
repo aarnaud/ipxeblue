@@ -21,6 +21,8 @@ import (
 )
 
 func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip pgtype.Inet) models.Computer {
+	var computer models.Computer
+	var err error
 	db := c.MustGet("db").(*gorm.DB)
 
 	// auto set name based on hostname or asset for new computer
@@ -29,26 +31,35 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 		name = c.DefaultQuery("asset", "")
 	}
 
-	computer := models.Computer{
-		Name:              name,
-		Asset:             c.DefaultQuery("asset", ""),
-		BuildArch:         c.DefaultQuery("buildarch", ""),
-		Hostname:          c.DefaultQuery("hostname", ""),
-		LastSeen:          time.Now(),
-		Mac:               mac,
-		IP:                ip,
-		Manufacturer:      c.DefaultQuery("manufacturer", ""),
-		Platform:          c.DefaultQuery("platform", ""),
-		Product:           c.DefaultQuery("product", ""),
-		Serial:            c.DefaultQuery("serial", ""),
-		Uuid:              id,
-		Version:           c.DefaultQuery("version", ""),
-		LastIpxeaccountID: c.MustGet("account").(*models.Ipxeaccount).Username,
+	computer, err = searchComputer(db, id, mac)
+
+	if err != nil {
+		computer = models.Computer{
+			Name:              name,
+			Asset:             c.DefaultQuery("asset", ""),
+			BuildArch:         c.DefaultQuery("buildarch", ""),
+			Hostname:          c.DefaultQuery("hostname", ""),
+			LastSeen:          time.Now(),
+			Mac:               mac,
+			IP:                ip,
+			Manufacturer:      c.DefaultQuery("manufacturer", ""),
+			Platform:          c.DefaultQuery("platform", ""),
+			Product:           c.DefaultQuery("product", ""),
+			Serial:            c.DefaultQuery("serial", ""),
+			Uuid:              id,
+			Version:           c.DefaultQuery("version", ""),
+			LastIpxeaccountID: c.MustGet("account").(*models.Ipxeaccount).Username,
+		}
+		db.FirstOrCreate(&computer)
 	}
-	db.FirstOrCreate(&computer)
+
+	// Uuid may change with Virtual Machine like VMware
+	if computer.Uuid != id {
+		db.Model(&computer).Where("uuid = ?", computer.Uuid).Update("uuid", id)
+	}
+
 	if time.Now().Sub(computer.LastSeen).Seconds() > 10 {
 		computer.Asset = c.DefaultQuery("asset", "")
-		computer.BuildArch = c.DefaultQuery("buildarch", "")
 		computer.BuildArch = c.DefaultQuery("buildarch", "")
 		computer.Hostname = c.DefaultQuery("hostname", "")
 		computer.LastSeen = time.Now()
@@ -64,6 +75,19 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 	}
 
 	return computer
+}
+
+func searchComputer(db *gorm.DB, id uuid.UUID, mac pgtype.Macaddr) (models.Computer, error) {
+	computer := models.Computer{}
+	result := db.Where("uuid = ?", id).First(&computer)
+	if result.RowsAffected > 0 {
+		return computer, nil
+	}
+	result = db.Where("mac = ?", mac.Addr.String()).First(&computer)
+	if result.RowsAffected > 0 {
+		return computer, nil
+	}
+	return computer, fmt.Errorf("computer not found")
 }
 
 func IpxeScript(c *gin.Context) {
