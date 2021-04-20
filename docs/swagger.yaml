@@ -29,6 +29,8 @@ definitions:
         type: string
       protected:
         type: boolean
+      subpath:
+        type: string
       templatized:
         type: boolean
     type: object

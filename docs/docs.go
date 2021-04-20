@@ -638,6 +638,9 @@ var doc = `{
                 "protected": {
                     "type": "boolean"
                 },
+                "subpath": {
+                    "type": "string"
+                },
                 "templatized": {
                     "type": "boolean"
                 }
