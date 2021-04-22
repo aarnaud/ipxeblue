@@ -51,5 +51,17 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 			}
 			return fmt.Sprintf("%s%s", baseURL.String(), path), err
 		},
+		"GetTagValue": func(name string) (ret string, err error) {
+			computer := c.MustGet("computer").(*models.Computer)
+			if computer == nil {
+				return "", fmt.Errorf("failed to GetTagValue because computer is nil")
+			}
+			for _, tag := range computer.Tags {
+				if tag.Key == name {
+					return tag.Value, err
+				}
+			}
+			return "", err
+		},
 	}
 }
