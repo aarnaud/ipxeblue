@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-//
+// ListComputers
 // @Summary List computers
 // @Description List of computers filtered or not
 // @Accept  json
@@ -22,16 +22,16 @@ func ListComputers(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var total int64
+	db = ListFilter(db, c)
 	db.Model(&models.Computer{}).Count(&total)
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	computers := make([]models.Computer, 0)
-	db = ListFilter(db, c)
 	db.Preload("Tags").Find(&computers)
 	c.JSON(http.StatusOK, computers)
 }
 
-//
+// GetComputer
 // @Summary Get computer
 // @Description Get a computer by Id
 // @Accept  json
@@ -56,7 +56,7 @@ func GetComputer(c *gin.Context) {
 	c.JSON(http.StatusOK, computer)
 }
 
-//
+// UpdateComputer
 // @Summary Update computer
 // @Description Update a computer
 // @Accept  json
@@ -126,7 +126,7 @@ func UpdateComputer(c *gin.Context) {
 	c.JSON(http.StatusOK, computer)
 }
 
-//
+// DeleteComputer
 // @Summary Delete computer
 // @Description Delete a computer
 // @Accept  json

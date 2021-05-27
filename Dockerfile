@@ -25,7 +25,7 @@ RUN yarn build
 ############################
 # STEP 3 ca-certificates
 ############################
-FROM alpine:3.6 as alpine
+FROM alpine:3 as alpine
 
 RUN apk add -U --no-cache ca-certificates
 
@@ -40,7 +40,7 @@ WORKDIR /app/
 # Import from builder.
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/ipxeblue /app/ipxeblue
-COPY --from=builderui /webui/build /app/ui
+COPY --from=builderui /webui/build /app/admin
 COPY templates /app/templates
 ENTRYPOINT ["/app/ipxeblue"]
 EXPOSE 8080

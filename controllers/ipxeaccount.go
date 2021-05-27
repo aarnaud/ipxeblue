@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-//
+// ListIpxeaccount
 // @Summary List iPXE account
 // @Description List of accounts for ipxe
 // @Accept  json
@@ -21,16 +21,16 @@ func ListIpxeaccount(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var total int64
+	db = ListFilter(db, c)
 	db.Model(&models.Ipxeaccount{}).Count(&total)
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	logins := make([]models.Ipxeaccount, 0)
-	db = ListFilter(db, c)
 	db.Find(&logins)
 	c.JSON(http.StatusOK, logins)
 }
 
-//
+// GetIpxeaccount
 // @Summary Get iPXE account
 // @Description Get iPXE account by username
 // @Accept  json
@@ -55,7 +55,7 @@ func GetIpxeaccount(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
-//
+// CreateIpxeaccount
 // @Summary Create iPXE account
 // @Description Create a iPXE account
 // @Accept  json
@@ -93,7 +93,7 @@ func CreateIpxeaccount(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
-//
+// UpdateIpxeaccount
 // @Summary Update iPXE account
 // @Description Update a iPXE account
 // @Accept  json
@@ -139,7 +139,7 @@ func UpdateIpxeaccount(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
-//
+// DeleteIpxeaccount
 // @Summary Delete iPXE account
 // @Description Delete a iPXE account
 // @Accept  json

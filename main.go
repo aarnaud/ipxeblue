@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"net/http"
 	"time"
 )
 
@@ -30,8 +31,11 @@ func main() {
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	appconf := utils.GetConfig()
 
-	router := gin.Default()
-	router.Use(logger.SetLogger())
+	router := gin.New()
+	router.Use(logger.SetLogger(logger.Config{
+		SkipPath: []string{"/healthz"},
+	}))
+	router.Use(gin.Recovery())
 
 	// CORS for https://foo.com and https://github.com origins, allowing:
 	// - PUT and PATCH methods
@@ -58,6 +62,7 @@ func main() {
 		c.Set("db", db)
 		c.Set("filestore", filestore)
 		c.Set("config", appconf)
+		c.Header("Cache-Control", "no-store, max-age=0")
 		c.Next()
 	})
 
@@ -70,8 +75,12 @@ func main() {
 		router.Use(midlewares.MidlewareDevWebUI())
 	} else {
 		// Serve react-admin webui
-		router.Static("/ui", "./ui")
+		router.Static("/admin", "./admin")
 	}
+
+	router.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{})
+	})
 
 	// iPXE request with auth
 	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))

@@ -3,10 +3,14 @@ package utils
 import (
 	"fmt"
 	"github.com/aarnaud/ipxeblue/models"
-	"github.com/rs/zerolog/log"
+	zlog "github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
+	"time"
 )
 
 func Database() *gorm.DB {
@@ -29,18 +33,30 @@ func Database() *gorm.DB {
 		databaseUrl = viperDBUrl
 	}
 
+	dbLogger := logger.New(
+		log.New(os.Stdout, "", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             200 * time.Millisecond, // Slow SQL threshold
+			LogLevel:                  logger.Warn,            // Log level
+			IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
+			Colorful:                  false,                  // Disable color
+		},
+	)
+
 	db, err = gorm.Open(postgres.New(postgres.Config{
 		DSN: databaseUrl,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: dbLogger,
+	})
 	if err != nil {
-		log.Panic().Err(err).Msg("failed to connect to database!")
+		zlog.Panic().Err(err).Msg("failed to connect to database!")
 	}
 
 	err = db.AutoMigrate(&models.Computer{}, &models.Tag{}, &models.Ipxeaccount{}, &models.Bootentry{},
 		&models.BootentryFile{}, &models.Token{})
 
 	if err != nil {
-		log.Panic().Err(err).Msg("failed to automigrate database!")
+		zlog.Panic().Err(err).Msg("failed to automigrate database!")
 	}
 	return db
 }

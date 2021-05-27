@@ -92,6 +92,13 @@ func searchComputer(db *gorm.DB, id uuid.UUID, mac pgtype.Macaddr) (models.Compu
 
 func IpxeScript(c *gin.Context) {
 	config := c.MustGet("config").(*utils.Config)
+
+	// redirect to admin if it's a browser
+	if strings.Contains(c.Request.Header.Get("Accept"), "text/html") {
+		c.Redirect(http.StatusMultipleChoices, "/admin/")
+		return
+	}
+
 	// basic check or reply with ipxe chain
 	_, uuidExist := c.GetQuery("uuid")
 	_, macExist := c.GetQuery("mac")

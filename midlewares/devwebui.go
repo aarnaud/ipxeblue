@@ -13,13 +13,10 @@ func MidlewareDevWebUI() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		if c.Request.URL.Path == "/ui" || c.Request.URL.Path == "/ui/" || c.Request.URL.Path == "/sockjs-node" {
+		if c.Request.URL.Path == "/admin" || strings.HasPrefix(c.Request.URL.Path, "/admin/") || c.Request.URL.Path == "/sockjs-node" {
 			ProxyDevWebUI(c)
 		}
-		if strings.Contains(c.Request.Header.Get("Referer"), "/ui") {
-			ProxyDevWebUI(c)
-			return
-		}
+
 		if c.Request.Header.Get("Upgrade") == "websocket" {
 			ProxyDevWebUI(c)
 			return

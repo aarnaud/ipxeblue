@@ -16,6 +16,10 @@ type Ipxeaccount struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+var IpxeAccountSearchFields = []string{
+	"username",
+}
+
 // HashPassword : Encrypt user password
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

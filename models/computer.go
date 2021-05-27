@@ -30,6 +30,14 @@ type Computer struct {
 	UpdatedAt         time.Time      `json:"updated_at"`
 }
 
+var ComputerSearchFields = []string{
+	"name",
+	"hostname",
+	"mac",
+	"ip",
+	"serial",
+}
+
 // MarshalJSON initializes nil slices and then marshals the bag to JSON
 func (c Computer) MarshalJSON() ([]byte, error) {
 	if c.Tags == nil {

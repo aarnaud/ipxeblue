@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/aarnaud/ipxeblue/models"
+	"github.com/aarnaud/ipxeblue/utils/helpers"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"regexp"
@@ -44,18 +46,36 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 		db = db.Order(fmt.Sprintf("%s %s", ToSnakeCase(value), order))
 	}
 
-	for q, v := range c.Request.URL.Query() {
-		if strings.HasPrefix(q, "_") {
-			continue
+	if value, exist := c.GetQuery("q"); exist {
+		query := strings.Builder{}
+		fields := SearchFields(c)
+		queryvalues := make([]interface{}, len(fields))
+		for i, field := range fields {
+			if query.Len() != 0 {
+				query.WriteString(" OR ")
+			}
+			queryvalues[i] = fmt.Sprintf("%%%s%%", value)
+			query.WriteString(fmt.Sprintf("%s ILIKE ?", field))
 		}
-		if len(v) > 0 {
-			value := v[0]
-			// react-admin use id as primary key, so we convert the key depends of object
-			q = ConvertReactAdminID(c, q)
-			if strings.Contains(value, "%") {
-				db = db.Where(fmt.Sprintf("%s ~~ ?", q), value)
-			} else {
-				db = db.Where(fmt.Sprintf("%s = ?", q), value)
+		db = db.Where(query.String(), queryvalues...)
+
+	} else {
+		for q, v := range c.Request.URL.Query() {
+			if strings.HasPrefix(q, "_") {
+				continue
+			}
+			if len(v) == 1 {
+				value := v[0]
+				// react-admin use id as primary key, so we convert the key depends of object
+				q = ConvertReactAdminID(c, q)
+				if helpers.StringToType(value) == helpers.TYPE_STRING {
+					db = db.Where(fmt.Sprintf("%s ILIKE ?", q), fmt.Sprintf("%%%s%%", value))
+				} else {
+					db = db.Where(fmt.Sprintf("%s = ?", q), value)
+				}
+			}
+			if len(v) > 1 {
+				db = db.Where(fmt.Sprintf("%s IN ?", q), v)
 			}
 		}
 	}
@@ -74,4 +94,19 @@ func ConvertReactAdminID(c *gin.Context, key string) string {
 		return "username"
 	}
 	return key
+}
+
+func SearchFields(c *gin.Context) []string {
+	if strings.Contains(c.FullPath(), "/computers") {
+		return models.ComputerSearchFields
+	}
+	if strings.Contains(c.FullPath(), "/bootentries") {
+		return models.BootentrySearchFields
+	}
+	if strings.Contains(c.FullPath(), "/ipxeaccounts") {
+		return models.IpxeAccountSearchFields
+	}
+	return []string{
+		"id",
+	}
 }

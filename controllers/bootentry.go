@@ -15,7 +15,7 @@ import (
 	"strconv"
 )
 
-//
+// ListBootentries
 // @Summary List Bootentries
 // @Description List of Bootentry filtered or not
 // @Accept  json
@@ -27,16 +27,16 @@ func ListBootentries(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var total int64
+	db = ListFilter(db, c)
 	db.Model(&models.Bootentry{}).Count(&total)
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	bootentries := make([]models.Bootentry, 0)
-	db = ListFilter(db, c)
 	db.Preload("Files").Find(&bootentries)
 	c.JSON(http.StatusOK, bootentries)
 }
 
-//
+// GetBootentry
 // @Summary Get Bootentry
 // @Description Get a Bootentry by Id
 // @Accept  json
@@ -61,7 +61,7 @@ func GetBootentry(c *gin.Context) {
 	c.JSON(http.StatusOK, bootentry)
 }
 
-//
+// CreateBootentry
 // @Summary Create Bootentry
 // @Description Create a Bootentry
 // @Accept  json
@@ -100,7 +100,7 @@ func CreateBootentry(c *gin.Context) {
 	c.JSON(http.StatusOK, bootentry)
 }
 
-//
+// UpdateBootentry
 // @Summary Update Bootentry
 // @Description Update a Bootentry
 // @Accept  json
@@ -192,7 +192,7 @@ func UpdateBootentry(c *gin.Context) {
 	c.JSON(http.StatusOK, bootentry)
 }
 
-//
+// DeleteBootentry
 // @Summary Delete Bootentry
 // @Description Delete Bootentry
 // @Accept  json

@@ -15,6 +15,10 @@ type BootentryFile struct {
 	Bootentry     *Bootentry `gorm:"foreignkey:bootentry_uuid;References:Uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
+var BootentrySearchFields = []string{
+	"name",
+}
+
 func (b *BootentryFile) GetFileStorePath() string {
 	return fmt.Sprintf("%s/files/%s", b.BootentryUUID.String(), b.Name)
 }
