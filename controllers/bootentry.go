@@ -32,6 +32,7 @@ func ListBootentries(c *gin.Context) {
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	bootentries := make([]models.Bootentry, 0)
+	db = PaginationFilter(db, c)
 	db.Preload("Files").Find(&bootentries)
 	c.JSON(http.StatusOK, bootentries)
 }

@@ -21,22 +21,7 @@ func ToSnakeCase(str string) string {
 }
 
 func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
-	var err error
-	var start int = 0
 	var order string = "ASC"
-	if value, exist := c.GetQuery("_start"); exist {
-		start, err = strconv.Atoi(value)
-		if err == nil {
-			db = db.Offset(start)
-		}
-		//todo: log of failed
-	}
-	if value, exist := c.GetQuery("_end"); exist {
-		if end, err := strconv.Atoi(value); err == nil {
-			db = db.Limit(end - start)
-		}
-		//todo: log of failed
-	}
 	if value, existe := c.GetQuery("_order"); existe {
 		order = value
 	}
@@ -80,6 +65,25 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 		}
 	}
 
+	return db
+}
+
+func PaginationFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
+	var err error
+	var start int = 0
+	if value, exist := c.GetQuery("_start"); exist {
+		start, err = strconv.Atoi(value)
+		if err == nil {
+			db = db.Offset(start)
+		}
+		//todo: log of failed
+	}
+	if value, exist := c.GetQuery("_end"); exist {
+		if end, err := strconv.Atoi(value); err == nil {
+			db = db.Limit(end - start)
+		}
+		//todo: log of failed
+	}
 	return db
 }
 

@@ -26,6 +26,7 @@ func ListIpxeaccount(c *gin.Context) {
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	logins := make([]models.Ipxeaccount, 0)
+	db = PaginationFilter(db, c)
 	db.Find(&logins)
 	c.JSON(http.StatusOK, logins)
 }

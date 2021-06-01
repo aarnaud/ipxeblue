@@ -27,6 +27,7 @@ func ListComputers(c *gin.Context) {
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
 
 	computers := make([]models.Computer, 0)
+	db = PaginationFilter(db, c)
 	db.Preload("Tags").Find(&computers)
 	c.JSON(http.StatusOK, computers)
 }
