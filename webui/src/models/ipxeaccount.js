@@ -27,7 +27,7 @@ const IpxeaccountFilter = (props) => (
 );
 
 export const IpxeaccountList = props => (
-    <List pagination={<PostPagination />} filters={<IpxeaccountFilter />} sort={{ field: 'username', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} perPage={15} filters={<IpxeaccountFilter />} sort={{ field: 'username', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="username" />
             <BooleanField source="is_admin" />

@@ -32,7 +32,7 @@ const BootentryFilter = (props) => (
 );
 
 export const BootentryList = props => (
-    <List pagination={<PostPagination />} filters={<BootentryFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} perPage={15} filters={<BootentryFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="id" disabled />
             <TextField source="name" />

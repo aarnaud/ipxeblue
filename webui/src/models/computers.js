@@ -42,7 +42,7 @@ const ComputerFilter = (props) => (
 );
 
 export const ComputerList = props => (
-    <List pagination={<PostPagination />} filters={<ComputerFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
+    <List pagination={<PostPagination />} perPage={15} filters={<ComputerFilter />} sort={{ field: 'name', order: 'ASC' }} {...props}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="mac" />
