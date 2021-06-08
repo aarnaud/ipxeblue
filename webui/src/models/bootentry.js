@@ -22,6 +22,9 @@ import {
 } from 'react-admin';
 
 const PostPagination = props => <Pagination rowsPerPageOptions={[15, 30, 50, 100, 200]} {...props} />;
+const EditTitle = ({ record }) => {
+    return <span>{record ? `${record.name}` : ''}</span>;
+};
 
 const BootentryFilter = (props) => (
     <Filter {...props}>
@@ -58,8 +61,7 @@ export const BootentryCreate = props => (
 );
 
 export const BootentryEdit = props => (
-    // undoable={false} disable optimistic rendering
-    <Edit undoable={false} {...props}>
+    <Edit mutationMode="pessimistic" title={<EditTitle />} {...props}>
         <SimpleForm>
             <TextInput source="id" disabled />
             <DateTimeInput source="created_at" disabled />

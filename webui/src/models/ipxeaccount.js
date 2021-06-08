@@ -18,6 +18,9 @@ import {
 } from 'react-admin';
 
 const PostPagination = props => <Pagination rowsPerPageOptions={[15, 30, 50, 100, 200]} {...props} />;
+const EditTitle = ({ record }) => {
+    return <span>{record ? `${record.username}` : ''}</span>;
+};
 
 const IpxeaccountFilter = (props) => (
     <Filter {...props}>
@@ -52,8 +55,7 @@ export const IpxeaccountCreate = props => (
 );
 
 export const IpxeaccountEdit = props => (
-    // undoable={false} disable optimistic rendering
-    <Edit undoable={false} {...props}>
+    <Edit mutationMode="pessimistic" title={<EditTitle />} {...props}>
         <SimpleForm>
             <TextInput source="username" disabled />
             <TextInput source="password" type="password" />
