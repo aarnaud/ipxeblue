@@ -63,5 +63,12 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 			}
 			return "", err
 		},
+		"GetComputerName": func() (ret string, err error) {
+			computer := c.MustGet("computer").(*models.Computer)
+			if computer == nil {
+				return "", fmt.Errorf("failed to GetTagValue because computer is nil")
+			}
+			return computer.Name, nil
+		},
 	}
 }
