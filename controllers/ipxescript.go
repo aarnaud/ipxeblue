@@ -150,12 +150,14 @@ func IpxeScript(c *gin.Context) {
 	c.Set("computer", &computer)
 
 	c.Header("Content-Type", "text/plain; charset=utf-8")
-	bootentry := models.Bootentry{}
-	result := db.Preload("Files").Where("uuid = ?", computer.BootentryUUID).First(&bootentry)
+	bootorder := models.Bootorder{}
+	result := db.Preload("Bootentry").Preload("Bootentry.Files").
+		Where("computer_uuid = ?", computer.Uuid).Order("bootorders.order").First(&bootorder)
 	if result.RowsAffected == 0 {
 		c.HTML(http.StatusOK, "empty.gohtml", gin.H{})
 		return
 	}
+	bootentry := bootorder.Bootentry
 
 	// Create template name by the uuid
 	tpl := template.New(bootentry.Uuid.String())
@@ -206,9 +208,7 @@ func IpxeScript(c *gin.Context) {
 
 	// reset bootentry if not persistent
 	if !*bootentry.Persistent {
-		db.Model(&computer).Updates(map[string]interface{}{
-			"BootentryUUID": nil,
-		})
+		db.Model(&bootorder).Delete(&bootorder)
 	}
 
 	c.Data(http.StatusOK, "text/plain", writer.Bytes())

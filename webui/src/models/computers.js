@@ -12,7 +12,6 @@ import {
     Filter,
     List,
     Pagination,
-    ReferenceField,
     ReferenceInput,
     SelectInput,
     SimpleForm,
@@ -55,9 +54,11 @@ export const ComputerList = props => (
             <TextField source="product" />
             <TextField source="serial" />
             <TextField source="version" />
-            <ReferenceField label="Bootentry" source="bootentry_uuid" reference="bootentries">
-                <TextField source="name" />
-            </ReferenceField>
+            <ArrayField source="bootorder">
+                <SingleFieldList linkType={false}>
+                    <ChipField source="name" label="Name"  />
+                </SingleFieldList>
+            </ArrayField>
             <ArrayField source="tags">
                 <SingleFieldList linkType={false}>
                     <ChipField source="value" label="value"  />
@@ -73,9 +74,13 @@ export const ComputerEdit = props => (
     <Edit mutationMode="pessimistic" title={<EditTitle />} {...props}>
         <SimpleForm>
             <TextInput source="name" />
-            <ReferenceInput label="Bootentry" source="bootentry_uuid" allowEmpty={true} reference="bootentries">
-                <SelectInput optionText="description" />
-            </ReferenceInput>
+            <ArrayInput source="bootorder">
+                <SimpleFormIterator>
+                    <ReferenceInput label="Bootentry" source="id" validate={[required()]} reference="bootentries" >
+                        <SelectInput optionText="description" />
+                    </ReferenceInput>
+                </SimpleFormIterator>
+            </ArrayInput>
             <ArrayInput source="tags">
                 <SimpleFormIterator>
                     <TextInput source="key" label="key" validate={[required()]} />

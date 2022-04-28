@@ -28,7 +28,9 @@ func ListComputers(c *gin.Context) {
 
 	computers := make([]models.Computer, 0)
 	db = PaginationFilter(db, c)
-	db.Preload("Tags").Find(&computers)
+	db.Preload("Tags").Preload("Bootorder", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bootorders.order ASC")
+	}).Preload("Bootorder.Bootentry").Find(&computers)
 	c.JSON(http.StatusOK, computers)
 }
 
@@ -47,7 +49,9 @@ func GetComputer(c *gin.Context) {
 	id := c.Param("id")
 
 	computer := models.Computer{}
-	result := db.Preload("Tags").Where("uuid = ?", id).First(&computer)
+	result := db.Preload("Tags").Preload("Bootorder", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bootorders.order ASC")
+	}).Preload("Bootorder.Bootentry").Where("uuid = ?", id).First(&computer)
 	if result.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, models.Error{
 			Error: fmt.Sprintf("Computer with uuid %s not found", id),
@@ -87,9 +91,9 @@ func UpdateComputer(c *gin.Context) {
 	}
 
 	result := db.Session(&gorm.Session{FullSaveAssociations: true}).Model(&computerUpdate).Updates(map[string]interface{}{
-		"Name":          computerUpdate.Name,
-		"Tags":          computerUpdate.Tags,
-		"BootentryUUID": computerUpdate.BootentryUUID,
+		"Name":      computerUpdate.Name,
+		"Tags":      computerUpdate.Tags,
+		"Bootorder": computerUpdate.Bootorder,
 	})
 
 	if result.RowsAffected == 0 {
@@ -101,7 +105,7 @@ func UpdateComputer(c *gin.Context) {
 
 	// clean tags not present in updated object
 	computer := models.Computer{}
-	db.Preload("Tags").First(&computer, "uuid = ?", computerUpdate.Uuid)
+	db.Preload("Tags").Preload("Bootorder").First(&computer, "uuid = ?", computerUpdate.Uuid)
 	for _, tagInDB := range computer.Tags {
 		toDelete := true
 		for _, tagToKeep := range computerUpdate.Tags {
@@ -120,9 +124,34 @@ func UpdateComputer(c *gin.Context) {
 		}
 	}
 
+	// Delete orphan bootorder
+	for _, bootorderInDB := range computer.Bootorder {
+		toDelete := true
+		for _, bootentryToKeep := range computerUpdate.Bootorder {
+			if bootorderInDB.BootentryUuid.String() == bootentryToKeep.BootentryUuid.String() {
+				toDelete = false
+			}
+		}
+		if toDelete {
+
+			result = db.Delete(&models.Bootorder{
+				ComputerUuid:  computer.Uuid,
+				BootentryUuid: bootorderInDB.BootentryUuid,
+			}).Where("bootentryUuid = ? AND computerUuid = ?", bootorderInDB.BootentryUuid, computer.Uuid)
+			if result.RowsAffected == 0 {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, models.Error{
+					Error: fmt.Sprintf("failed to delete bootorder %s for computer %s", bootorderInDB.BootentryUuid, computer.Uuid),
+				})
+				return
+			}
+		}
+	}
+
 	// refresh data from DB before return it
 	computer = models.Computer{}
-	db.Preload("Tags").First(&computer, "uuid = ?", computerUpdate.Uuid)
+	db.Preload("Tags").Preload("Bootorder", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bootorders.order ASC")
+	}).Preload("Bootorder.Bootentry").First(&computer, "uuid = ?", computerUpdate.Uuid)
 
 	c.JSON(http.StatusOK, computer)
 }

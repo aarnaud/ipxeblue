@@ -53,7 +53,7 @@ func Database() *gorm.DB {
 	}
 
 	err = db.AutoMigrate(&models.Computer{}, &models.Tag{}, &models.Ipxeaccount{}, &models.Bootentry{},
-		&models.BootentryFile{}, &models.Token{})
+		&models.BootentryFile{}, &models.Bootorder{}, &models.Token{})
 
 	if err != nil {
 		zlog.Panic().Err(err).Msg("failed to automigrate database!")

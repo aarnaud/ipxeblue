@@ -49,10 +49,10 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 			if strings.HasPrefix(q, "_") {
 				continue
 			}
+			// react-admin use id as primary key, so we convert the key depends of object
+			q = ConvertReactAdminID(c, q)
 			if len(v) == 1 {
 				value := v[0]
-				// react-admin use id as primary key, so we convert the key depends of object
-				q = ConvertReactAdminID(c, q)
 				if helpers.StringToType(value) != helpers.TYPE_BOOL && helpers.StringToType(value) != helpers.TYPE_UUID &&
 					q != "ip" && q != "mac" {
 					db = db.Where(fmt.Sprintf("%s ILIKE ?", q), fmt.Sprintf("%%%s%%", value))
