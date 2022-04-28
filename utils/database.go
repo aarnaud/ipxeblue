@@ -54,9 +54,18 @@ func Database() *gorm.DB {
 
 	err = db.AutoMigrate(&models.Computer{}, &models.Tag{}, &models.Ipxeaccount{}, &models.Bootentry{},
 		&models.BootentryFile{}, &models.Bootorder{}, &models.Token{})
-
 	if err != nil {
 		zlog.Panic().Err(err).Msg("failed to automigrate database!")
 	}
+
+	// Custom migration database schema
+	// remove bootentry_uuid in computer since we have bootorder
+	computerRef := &models.Computer{}
+	if db.Migrator().HasColumn(computerRef, "bootentry_uuid") {
+		if err = db.Migrator().DropColumn(computerRef, "bootentry_uuid"); err != nil {
+			zlog.Panic().Err(err).Msg("failed to drop column bootentry_uuid")
+		}
+	}
+
 	return db
 }
