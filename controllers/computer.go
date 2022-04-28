@@ -103,6 +103,13 @@ func UpdateComputer(c *gin.Context) {
 		return
 	}
 
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, models.Error{
+			Error: fmt.Sprintf("Error to save changes of computer %s", id),
+		})
+		return
+	}
+
 	// clean tags not present in updated object
 	computer := models.Computer{}
 	db.Preload("Tags").Preload("Bootorder").First(&computer, "uuid = ?", computerUpdate.Uuid)
