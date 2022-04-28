@@ -1,10 +1,25 @@
 #!ipxe
+
+echo
+echo
+echo .###.########.##.....#.#######.########.##......##.....#.########
+echo ..##.##.....#..##...##.##......##.....#.##......##.....#.##......
+echo ..##.##.....#...##.##..##......##.....#.##......##.....#.##......
+echo ..##.########....###...######..########.##......##.....#.######..
+echo ..##.##.........##.##..##......##.....#.##......##.....#.##......
+echo ..##.##........##...##.##......##.....#.##......##.....#.##......
+echo .###.##.......##.....#.#######.########.#######..#######.########
+echo
+echo
+
 echo loading ipxe from {{ .BaseURL }}
+sleep 2
+
 isset ${username} || goto menu
 isset ${password} || goto menu
 
 :bootipxe
-chain {{ .Scheme }}://${username:uristring}:${password:uristring}@{{ .Host }}/?asset=${asset}&buildarch=${buildarch}&hostname=${hostname}&mac=${mac:hexhyp}&ip=${ip}&manufacturer=${manufacturer}&platform=${platform}&product=${product}&serial=${serial}&uuid=${uuid}&version=${version} || goto failed
+chain --replace {{ .Scheme }}://${username:uristring}:${password:uristring}@{{ .Host }}/?asset=${asset}&buildarch=${buildarch}&hostname=${hostname}&mac=${mac:hexhyp}&ip=${ip}&manufacturer=${manufacturer}&platform=${platform}&product=${product}&serial=${serial}&uuid=${uuid}&version=${version} || goto failed
 
 :menu
 menu Username or Password not set
