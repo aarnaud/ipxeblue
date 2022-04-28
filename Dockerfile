@@ -1,7 +1,7 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang as builder
+FROM docker.io/golang as builder
 
 
 WORKDIR $GOPATH/src/aarnaud/ipxeblue/
@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go/bin/ipxeblue -mod 
 ############################
 # STEP 2 build webui
 ############################
-FROM node:lts-buster as builderui
+FROM docker.io/node:lts-buster as builderui
 
 
 WORKDIR /webui/
@@ -25,7 +25,7 @@ RUN yarn build
 ############################
 # STEP 3 ca-certificates
 ############################
-FROM alpine:3 as alpine
+FROM docker.io/alpine:3 as alpine
 
 RUN apk add -U --no-cache ca-certificates
 
@@ -33,7 +33,7 @@ RUN apk add -U --no-cache ca-certificates
 ############################
 # STEP 4 build a small image
 ############################
-FROM scratch
+FROM docker.io/scratch
 
 ENV GIN_MODE=release
 WORKDIR /app/

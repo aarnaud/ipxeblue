@@ -1,20 +1,20 @@
 version: '3'
 services:
   database:
-    image: postgres
+    image: docker.io/postgres
     environment:
       - POSTGRES_USER=ipxeblue
       - POSTGRES_PASSWORD=thisisnotapassword
       - POSTGRES_DB=ipxeblue
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./.podman-data/postgres:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
   minio:
-    image: minio/minio
+    image: docker.io/minio/minio
     volumes:
-      - data:/data
+      - ./.podman-data/minio:/data
     ports:
       - 9000:9000
     environment:
@@ -28,15 +28,16 @@ services:
       retries: 3
 
   webui:
-    image: node:lts-buster
+    image: docker.io/node:lts-buster
     working_dir: /webui
     volumes:
     - ./webui:/webui
     command: "yarn start"
     ports:
       - 3000:3000
-volumes:
-  db-data:
-    driver: local
-  data:
-    driver: local
+
+#volumes:
+#  db-data:
+#    driver: local
+#  data:
+#    driver: local
