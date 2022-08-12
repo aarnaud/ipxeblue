@@ -22,8 +22,12 @@ func ListComputers(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
 	var total int64
-	// allow search by bootentry
-	db = db.Joins("Bootorder")
+
+	// hack to avoid multiple return of same computer
+	if _, existe := c.GetQuery("bootentry_uuid"); existe {
+		// allow search by bootentry
+		db = db.Joins("Bootorder")
+	}
 	db = ListFilter(db, c)
 	db.Model(&models.Computer{}).Count(&total)
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))
