@@ -40,7 +40,7 @@ const ComputerFilter = (props) => (
         <TextInput label="Product" source="product" allowEmpty />
         <TextInput label="Build Arch" source="build_arch" allowEmpty />
         <TextInput label="Platform" source="platform" allowEmpty />
-        <TextInput label="Tags" source="value" allowEmpty />
+        <TextInput label="Tag" source="tag" allowEmpty />
     </Filter>
 );
 

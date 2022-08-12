@@ -55,6 +55,13 @@ func ListFilter(db *gorm.DB, c *gin.Context) *gorm.DB {
 				value := v[0]
 				if helpers.StringToType(value) != helpers.TYPE_BOOL && helpers.StringToType(value) != helpers.TYPE_UUID &&
 					q != "ip" && q != "mac" {
+					// hack to manage key value search
+					if q == "tag" && strings.Contains(value, "=") {
+						keyandvalue := strings.Split(value, "=")
+						db = db.Where("key ILIKE ?", fmt.Sprintf("%%%s%%", keyandvalue[0]))
+						db = db.Where("value ILIKE ?", fmt.Sprintf("%%%s%%", keyandvalue[1]))
+						continue
+					}
 					db = db.Where(fmt.Sprintf("%s ILIKE ?", q), fmt.Sprintf("%%%s%%", value))
 				} else {
 					db = db.Where(fmt.Sprintf("%s = ?", q), value)

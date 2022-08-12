@@ -29,8 +29,8 @@ func ListComputers(c *gin.Context) {
 		db = db.Joins("Bootorder")
 	}
 	// hack to avoid multiple return of same computer without search field
-	if _, existe := c.GetQuery("value"); existe {
-		// allow search by bootentry
+	if _, existe := c.GetQuery("tag"); existe {
+		// allow search by tags
 		db = db.Joins("Tags")
 	}
 
