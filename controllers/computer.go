@@ -28,6 +28,12 @@ func ListComputers(c *gin.Context) {
 		// allow search by bootentry
 		db = db.Joins("Bootorder")
 	}
+	// hack to avoid multiple return of same computer without search field
+	if _, existe := c.GetQuery("value"); existe {
+		// allow search by bootentry
+		db = db.Joins("Tags")
+	}
+
 	db = ListFilter(db, c)
 	db.Model(&models.Computer{}).Count(&total)
 	c.Header("X-Total-Count", strconv.FormatInt(total, 10))

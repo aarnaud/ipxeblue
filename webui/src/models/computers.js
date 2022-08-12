@@ -32,14 +32,15 @@ const ComputerFilter = (props) => (
         <TextInput label="name" source="name" alwaysOn />
         <TextInput label="MAC" source="mac" alwaysOn />
         <TextInput label="IP" source="ip" alwaysOn />
-        <TextInput label="Manufacturer" source="manufacturer" allowEmpty />
-        <TextInput label="Product" source="product" allowEmpty />
         <TextInput label="Serial" source="serial" alwaysOn />
-        <TextInput label="Build Arch" source="build_arch" allowEmpty />
-        <TextInput label="Platform" source="platform" allowEmpty />
         <ReferenceInput label="Bootentry" source="bootentry_uuid" alwaysOn allowEmpty={true} reference="bootentries">
             <SelectInput optionText="name" />
         </ReferenceInput>
+        <TextInput label="Manufacturer" source="manufacturer" allowEmpty />
+        <TextInput label="Product" source="product" allowEmpty />
+        <TextInput label="Build Arch" source="build_arch" allowEmpty />
+        <TextInput label="Platform" source="platform" allowEmpty />
+        <TextInput label="Tags" source="value" allowEmpty />
     </Filter>
 );
 
