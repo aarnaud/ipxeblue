@@ -14,6 +14,7 @@ type Bootentry struct {
 	Description string          `json:"description"`
 	Persistent  *bool           `gorm:"not null;default:FALSE" json:"persistent"`
 	IpxeScript  string          `json:"ipxe_script"`
+	GrupScript  string          `json:"grub_script"`
 	Files       []BootentryFile `gorm:"foreignkey:bootentry_uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"files"`
 	Bootorder   []*Bootorder    `gorm:"foreignKey:bootentry_uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	CreatedAt   time.Time       `json:"created_at"`

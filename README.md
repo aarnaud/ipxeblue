@@ -108,6 +108,17 @@ you need to set `iPXE-specific options` see https://ipxe.org/howto/dhcpd
 }
 ```
 
+### Grub over PXE:
+> Secure Boot supported with signed binaries
+
+/srv/tftp/bootx64.efi  (sha256sum 8c885fa9886ab668da267142c7226b8ce475e682b99e4f4afc1093c5f77ce275)
+/srv/tftp/grubx64.efi  (sha256sum d0d6d85f44a0ffe07d6a856ad5a1871850c31af17b7779086b0b9384785d5449)
+/srv/tftp/grub/grub.cfg  
+```text
+insmod http
+source (http,192.168.32.7)/grub/
+```
+
 ## screenshots 
 
 ![Computer List](docs/images/computer-list.png?raw=true "Computer List")

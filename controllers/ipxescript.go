@@ -30,8 +30,15 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 	if name == "" {
 		name = c.DefaultQuery("asset", "")
 	}
+	if name == "" {
+		name = c.DefaultQuery("serial", "")
+	}
 
 	computer, err = searchComputer(db, id, mac)
+	var accountID *string
+	if value, ok := c.Get("account"); ok {
+		accountID = &value.(*models.Ipxeaccount).Username
+	}
 
 	if err != nil {
 		computer = models.Computer{
@@ -48,7 +55,7 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 			Serial:            c.DefaultQuery("serial", ""),
 			Uuid:              id,
 			Version:           c.DefaultQuery("version", ""),
-			LastIpxeaccountID: c.MustGet("account").(*models.Ipxeaccount).Username,
+			LastIpxeaccountID: accountID,
 		}
 		db.FirstOrCreate(&computer)
 	}
@@ -70,7 +77,7 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 		computer.Product = c.DefaultQuery("product", "")
 		computer.Serial = c.DefaultQuery("serial", "")
 		computer.Version = c.DefaultQuery("version", "")
-		computer.LastIpxeaccountID = c.MustGet("account").(*models.Ipxeaccount).Username
+		computer.LastIpxeaccountID = accountID
 		db.Save(computer)
 	}
 

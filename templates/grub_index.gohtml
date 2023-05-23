@@ -1,0 +1,25 @@
+echo
+echo
+echo .###.########.##.....#.#######.########.##......##.....#.########
+echo ..##.##.....#..##...##.##......##.....#.##......##.....#.##......
+echo ..##.##.....#...##.##..##......##.....#.##......##.....#.##......
+echo ..##.########....###...######..########.##......##.....#.######..
+echo ..##.##.........##.##..##......##.....#.##......##.....#.##......
+echo ..##.##........##...##.##......##.....#.##......##.....#.##......
+echo .###.##.......##.....#.#######.########.#######..#######.########
+echo
+echo
+
+echo "loading ipxe from {{ .BaseURL }}"
+sleep 2
+
+smbios --type 1 --get-string 4 --set smbios_manufacturer
+smbios --type 1 --get-string 5 --set smbios_product
+smbios --type 1 --get-string 7 --set smbios_serial
+smbios --type 1 --get-uuid 8 --set smbios_uuid
+smbios --type 1 --get-string 25 --set smbios_sku
+smbios --type 1 --get-string 26 --set smbios_family
+smbios --type 2 --get-string 8 --set smbios_asset
+insmod http
+#source "(http,{{ .Host }})/grub/?asset=$smbios_asset&mac=$net_default_mac&ip=$net_default_ip&buildarch=$grub_cpu&platform=$grub_platform&manufacturer=$smbios_manufacturer&product=$smbios_product&serial=$smbios_serial&uuid=$smbios_uuid"
+source "(http,{{ .Host }})/grub/?mac=$net_default_mac&ip=$net_default_ip&uuid=$smbios_uuid&serial=$smbios_serial&manufacturer=$smbios_manufacturer"

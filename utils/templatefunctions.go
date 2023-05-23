@@ -42,6 +42,19 @@ func GetCustomFunctions(c *gin.Context, tpl *template.Template) template.FuncMap
 			}
 			return fmt.Sprintf("%s%s", baseURL.String(), path), err
 		},
+		"GetGrubDownloadPath": func(bootentry models.Bootentry, filename string) (ret string, err error) {
+			file := bootentry.GetFile(filename)
+			if file == nil {
+				return fmt.Sprintf("%s not found in bootentry %s", filename, bootentry.Uuid), err
+			}
+			path, token := file.GetDownloadPath()
+			if token != nil {
+				// Get computer in gin context to add it in token, to used it in file template.
+				token.Computer = *c.MustGet("computer").(*models.Computer)
+				db.Create(&token)
+			}
+			return fmt.Sprintf("(http,%s)%s", baseURL.Host, path), err
+		},
 		"GetDownloadBaseURL": func(bootentry models.Bootentry) (ret string, err error) {
 			path, token := bootentry.GetDownloadBasePath()
 			if token != nil {

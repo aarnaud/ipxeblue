@@ -82,6 +82,11 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{})
 	})
 
+	if appconf.GrubSupportEnabled {
+		// Grub request without auth
+		router.GET("/grub/", controllers.GrubScript)
+	}
+
 	// iPXE request with auth
 	ipxeroute := router.Group("/", midlewares.BasicAuthIpxeAccount(false))
 	ipxeroute.GET("/", controllers.IpxeScript)

@@ -56,6 +56,7 @@ export const BootentryCreate = props => (
             <TextInput source="description" validate={[required()]} />
             <BooleanInput source="persistent" />
             <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="ipxe_script" />
+            <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="grub_script" />
         </SimpleForm>
     </Create>
 );
@@ -70,6 +71,7 @@ export const BootentryEdit = props => (
             <TextInput source="description" validate={[required()]} />
             <BooleanInput source="persistent" />
             <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="ipxe_script" />
+            <TextInput component="pre" fullWidth={true} rows={10} options={{ multiline: true }} source="grub_script" />
             <ArrayInput source="files">
                 <SimpleFormIterator>
                     <BooleanInput source="protected" label="Protected" />

@@ -23,7 +23,7 @@ type Computer struct {
 	Version           string         `json:"version"`
 	Tags              []*Tag         `gorm:"foreignkey:computer_uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tags"`
 	Bootorder         []*Bootorder   `gorm:"foreignKey:computer_uuid;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
-	LastIpxeaccountID string         `json:"last_ipxeaccount"`
+	LastIpxeaccountID *string        `json:"last_ipxeaccount"`
 	LastIpxeaccount   *Ipxeaccount   `gorm:"foreignkey:last_ipxeaccount_id;References:Username;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;default:NULL" json:"-"`
 	CreatedAt         time.Time      `json:"created_at"`
 	UpdatedAt         time.Time      `json:"updated_at"`
