@@ -15,11 +15,12 @@ type MinioConfig struct {
 }
 
 type Config struct {
-	Port               int
-	EnableAPIAuth      bool
-	MinioConfig        MinioConfig
-	BaseURL            *url.URL
-	GrubSupportEnabled bool
+	Port                 int
+	EnableAPIAuth        bool
+	MinioConfig          MinioConfig
+	BaseURL              *url.URL
+	GrubSupportEnabled   bool
+	DefaultBootentryName string
 }
 
 func GetConfig() *Config {
@@ -68,6 +69,7 @@ func GetConfig() *Config {
 	config.BaseURL = u
 
 	config.GrubSupportEnabled = viper.GetBool("GRUB_SUPPORT_ENABLED")
+	config.DefaultBootentryName = viper.GetString("DEFAULT_BOOTENTRY_NAME")
 
 	return &config
 }

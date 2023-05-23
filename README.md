@@ -32,6 +32,10 @@ Supported environment variables
 - `MINIO_SECURE`
 - `MINIO_BUCKETNAME`
   - default: `ipxeblue`
+- `GRUB_SUPPORT_ENABLED`
+  - default: `False`
+- `DEFAULT_BOOTENTRY_NAME`
+  - default: ``
   
 ## DHCP or ipxe config for connection to ipxeblue
 
