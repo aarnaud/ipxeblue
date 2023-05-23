@@ -44,7 +44,7 @@ set crosscert http://ca.ipxe.org/auto
 chain https://USERNAME:PASSWORD@FQDN/?asset=${asset}&buildarch=${buildarch}&hostname=${hostname}&mac=${mac:hexhyp}&ip=${ip}&manufacturer=${manufacturer}&platform=${platform}&product=${product}&serial=${serial}&uuid=${uuid}&version=${version}
 ```
 
-For isc-dhcp-server
+### For isc-dhcp-server
 
 you need to set `iPXE-specific options` see https://ipxe.org/howto/dhcpd
 
@@ -62,6 +62,50 @@ you need to set `iPXE-specific options` see https://ipxe.org/howto/dhcpd
   }
   # a TFTP server to load iPXE if not already load by default
   next-server 10.123.123.123;
+```
+
+### For kea-dhcp-server
+```text
+"Dhcp4": {
+    ... 
+    "option-def": [
+                { "space": "dhcp4", "name": "ipxe-encap-opts", "code": 175, "type": "empty", "array": false, "record-types": "", "encapsulate": "ipxe" },
+                { "space": "ipxe", "name": "crosscert", "code": 93, "type": "string" },
+                { "space": "ipxe", "name": "username", "code": 190, "type": "string" },
+                { "space": "ipxe", "name": "password", "code": 191, "type": "string" }
+    ],
+    "client-classes": [
+        {
+            "name": "XClient_iPXE",
+            "test": "substring(option[77].hex,0,4) == 'iPXE'",
+            "boot-file-name": "ipxeblue.ipxe",
+            "option-data": [
+                { "space": "dhcp4", "name": "ipxe-encap-opts", "code": 175 },
+                { "space": "ipxe", "name": "crosscert", "data": "http://ca.ipxe.org/auto" },
+                { "space": "ipxe", "name": "username", "data": "demo" },
+                { "space": "ipxe", "name": "password", "data": "demo" }
+            ]
+        },
+        {
+            "name": "UEFI-64",
+            "test": "substring(option[60].hex,0,20) == 'PXEClient:Arch:00007'",
+             "boot-file-name": "snponly.efi"
+        },
+        {
+            "name": "Legacy",
+            "test": "substring(option[60].hex,0,20) == 'PXEClient:Arch:00000'",
+            "boot-file-name": "undionly.kpxe"
+        }
+    ],
+    "subnet4": [
+        {
+        ...
+        "next-server": "10.123.123.123",
+        ...
+        }
+    ]
+    ...
+}
 ```
 
 ## screenshots 
