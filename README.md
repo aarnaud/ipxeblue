@@ -34,6 +34,8 @@ Supported environment variables
   - default: `ipxeblue`
 - `GRUB_SUPPORT_ENABLED`
   - default: `False`
+- `TFTP_ENABLED`
+  - default: `False`
 - `DEFAULT_BOOTENTRY_NAME`
   - default: ``
   

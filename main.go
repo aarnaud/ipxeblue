@@ -9,11 +9,13 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/pin/tftp/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -84,7 +86,22 @@ func main() {
 
 	if appconf.GrubSupportEnabled {
 		// Grub request without auth
+		log.Info().Msg("enabling grub http endpoint")
 		router.GET("/grub/", controllers.GrubScript)
+	}
+
+	// grub don't support long http queries
+	// using TFTP to pass positional metadata in tftp path
+	if appconf.TFTPEnabled {
+		s := tftp.NewServer(controllers.GetTFTPReader(appconf, db), controllers.GetTFTPWriter(appconf))
+		s.SetTimeout(30 * time.Second)
+		go func() {
+			log.Info().Msg("starting tftp server")
+			err := s.ListenAndServe(":69")
+			if err != nil {
+				fmt.Fprintf(os.Stdout, "server: %v\n", err)
+			}
+		}()
 	}
 
 	// iPXE request with auth
@@ -127,5 +144,6 @@ func main() {
 	v1.POST("/bootentries/:uuid/files/:name", controllers.UploadBootentryFile)
 	v1.GET("/bootentries/:uuid/files/:name", controllers.DownloadBootentryFile)
 
+	log.Info().Msg("starting http server")
 	router.Run(fmt.Sprintf(":%d", appconf.Port))
 }

@@ -20,6 +20,7 @@ type Config struct {
 	MinioConfig          MinioConfig
 	BaseURL              *url.URL
 	GrubSupportEnabled   bool
+	TFTPEnabled          bool
 	DefaultBootentryName string
 }
 
@@ -35,6 +36,7 @@ func GetConfig() *Config {
 			BucketName: "ipxeblue",
 		},
 		GrubSupportEnabled: false,
+		TFTPEnabled:        false,
 	}
 
 	if p := viper.GetInt("PORT"); p != 0 {
@@ -69,6 +71,7 @@ func GetConfig() *Config {
 	config.BaseURL = u
 
 	config.GrubSupportEnabled = viper.GetBool("GRUB_SUPPORT_ENABLED")
+	config.TFTPEnabled = viper.GetBool("TFTP_ENABLED")
 	config.DefaultBootentryName = viper.GetString("DEFAULT_BOOTENTRY_NAME")
 
 	return &config

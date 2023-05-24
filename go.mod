@@ -11,6 +11,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgtype v1.5.0
 	github.com/minio/minio-go/v7 v7.0.6
+	github.com/pin/tftp/v3 v3.0.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/zerolog v1.16.0
 	github.com/spf13/viper v1.7.1

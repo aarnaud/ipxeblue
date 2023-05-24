@@ -1,3 +1,5 @@
 ipxeblue
 vendors
 .podman-data
+!tftp/.gitkeep
+tftp/
