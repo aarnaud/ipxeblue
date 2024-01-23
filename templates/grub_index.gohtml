@@ -1,0 +1,24 @@
+echo
+echo
+echo .###.########.##.....#.#######.########.##......##.....#.########
+echo ..##.##.....#..##...##.##......##.....#.##......##.....#.##......
+echo ..##.##.....#...##.##..##......##.....#.##......##.....#.##......
+echo ..##.########....###...######..########.##......##.....#.######..
+echo ..##.##.........##.##..##......##.....#.##......##.....#.##......
+echo ..##.##........##...##.##......##.....#.##......##.....#.##......
+echo .###.##.......##.....#.#######.########.#######..#######.########
+echo
+echo
+
+echo "loading ipxe from {{ .BaseURL }}"
+sleep 2
+
+smbios --type 1 --get-string 4 --set smbios_manufacturer
+smbios --type 1 --get-string 5 --set smbios_product
+smbios --type 1 --get-string 7 --set smbios_serial
+smbios --type 1 --get-uuid 8 --set smbios_uuid
+smbios --type 2 --get-string 8 --set smbios_asset
+insmod http
+
+echo "(tftp)/grub/$net_default_mac/$net_default_ip/$smbios_uuid/-$smbios_asset/-$smbios_manufacturer/-$smbios_serial/-$smbios_product/$grub_cpu/$grub_platform/grub.cfg"
+source "(tftp)/grub/$net_default_mac/$net_default_ip/$smbios_uuid/-$smbios_asset/-$smbios_manufacturer/-$smbios_serial/-$smbios_product/$grub_cpu/$grub_platform/grub.cfg"

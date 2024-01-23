@@ -21,34 +21,67 @@ import (
 )
 
 func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip pgtype.Inet) models.Computer {
+	config := c.MustGet("config").(*utils.Config)
 	var computer models.Computer
 	var err error
 	db := c.MustGet("db").(*gorm.DB)
 
+	/*
+		a = asset
+		m = manufacturer
+		p = product
+		f = family
+		sn = serial
+		uuid = uuid
+		c = cpu_arch
+		t = platform
+		h = hostname
+		v = version
+	*/
+
 	// auto set name based on hostname or asset for new computer
 	name := c.DefaultQuery("hostname", "")
 	if name == "" {
-		name = c.DefaultQuery("asset", "")
+		name = c.DefaultQuery("asset", c.DefaultQuery("a", ""))
+	}
+	if name == "" {
+		name = c.DefaultQuery("serial", c.DefaultQuery("sn", ""))
 	}
 
 	computer, err = searchComputer(db, id, mac)
+	var accountID *string
+	if value, ok := c.Get("account"); ok {
+		accountID = &value.(*models.Ipxeaccount).Username
+	}
 
 	if err != nil {
+		// Default bootentry for new computer
+		bootorder := make([]*models.Bootorder, 0)
+		if config.DefaultBootentryName != "" {
+			defaultBootentry := &models.Bootentry{}
+			result := db.Where("name = ?", config.DefaultBootentryName).Find(&defaultBootentry)
+			if result.RowsAffected != 0 {
+				bootorder = append(bootorder, &models.Bootorder{
+					BootentryUuid: defaultBootentry.Uuid,
+				})
+			}
+		}
 		computer = models.Computer{
 			Name:              name,
-			Asset:             c.DefaultQuery("asset", ""),
-			BuildArch:         c.DefaultQuery("buildarch", ""),
-			Hostname:          c.DefaultQuery("hostname", ""),
+			Asset:             c.DefaultQuery("asset", c.DefaultQuery("a", "")),
+			BuildArch:         c.DefaultQuery("buildarch", c.DefaultQuery("c", "")),
+			Hostname:          c.DefaultQuery("hostname", c.DefaultQuery("h", "")),
 			LastSeen:          time.Now(),
 			Mac:               mac,
 			IP:                ip,
-			Manufacturer:      c.DefaultQuery("manufacturer", ""),
-			Platform:          c.DefaultQuery("platform", ""),
-			Product:           c.DefaultQuery("product", ""),
-			Serial:            c.DefaultQuery("serial", ""),
+			Manufacturer:      c.DefaultQuery("manufacturer", c.DefaultQuery("m", "")),
+			Platform:          c.DefaultQuery("platform", c.DefaultQuery("t", "")),
+			Product:           c.DefaultQuery("product", c.DefaultQuery("p", "")),
+			Serial:            c.DefaultQuery("serial", c.DefaultQuery("sn", "")),
 			Uuid:              id,
-			Version:           c.DefaultQuery("version", ""),
-			LastIpxeaccountID: c.MustGet("account").(*models.Ipxeaccount).Username,
+			Version:           c.DefaultQuery("version", c.DefaultQuery("v", "")),
+			LastIpxeaccountID: accountID,
+			Bootorder:         bootorder,
 		}
 		db.FirstOrCreate(&computer)
 	}
@@ -59,18 +92,18 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 	}
 
 	if time.Now().Sub(computer.LastSeen).Seconds() > 10 {
-		computer.Asset = c.DefaultQuery("asset", "")
-		computer.BuildArch = c.DefaultQuery("buildarch", "")
+		computer.Asset = c.DefaultQuery("asset", c.DefaultQuery("a", ""))
+		computer.BuildArch = c.DefaultQuery("buildarch", c.DefaultQuery("c", ""))
 		computer.Hostname = c.DefaultQuery("hostname", "")
 		computer.LastSeen = time.Now()
 		computer.Mac = mac
 		computer.IP = ip
-		computer.Manufacturer = c.DefaultQuery("manufacturer", "")
-		computer.Platform = c.DefaultQuery("platform", "")
-		computer.Product = c.DefaultQuery("product", "")
-		computer.Serial = c.DefaultQuery("serial", "")
-		computer.Version = c.DefaultQuery("version", "")
-		computer.LastIpxeaccountID = c.MustGet("account").(*models.Ipxeaccount).Username
+		computer.Manufacturer = c.DefaultQuery("manufacturer", c.DefaultQuery("m", ""))
+		computer.Platform = c.DefaultQuery("platform", c.DefaultQuery("t", ""))
+		computer.Product = c.DefaultQuery("product", c.DefaultQuery("p", ""))
+		computer.Serial = c.DefaultQuery("serial", c.DefaultQuery("sn", ""))
+		computer.Version = c.DefaultQuery("version", c.DefaultQuery("v", ""))
+		computer.LastIpxeaccountID = accountID
 		db.Save(computer)
 	}
 

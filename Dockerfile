@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /go/bin/ipxeblue -mod 
 ############################
 # STEP 2 build webui
 ############################
-FROM node:lts-buster as builderui
+FROM node:16-bullseye as builderui
 
 
 WORKDIR /webui/

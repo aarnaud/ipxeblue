@@ -15,10 +15,13 @@ type MinioConfig struct {
 }
 
 type Config struct {
-	Port          int
-	EnableAPIAuth bool
-	MinioConfig   MinioConfig
-	BaseURL       *url.URL
+	Port                 int
+	EnableAPIAuth        bool
+	MinioConfig          MinioConfig
+	BaseURL              *url.URL
+	GrubSupportEnabled   bool
+	TFTPEnabled          bool
+	DefaultBootentryName string
 }
 
 func GetConfig() *Config {
@@ -32,6 +35,8 @@ func GetConfig() *Config {
 			Endpoint:   "127.0.0.1:9000",
 			BucketName: "ipxeblue",
 		},
+		GrubSupportEnabled: false,
+		TFTPEnabled:        false,
 	}
 
 	if p := viper.GetInt("PORT"); p != 0 {
@@ -64,6 +69,10 @@ func GetConfig() *Config {
 		log.Panic().Err(err).Msg("failed to parse BASE_URL")
 	}
 	config.BaseURL = u
+
+	config.GrubSupportEnabled = viper.GetBool("GRUB_SUPPORT_ENABLED")
+	config.TFTPEnabled = viper.GetBool("TFTP_ENABLED")
+	config.DefaultBootentryName = viper.GetString("DEFAULT_BOOTENTRY_NAME")
 
 	return &config
 }
