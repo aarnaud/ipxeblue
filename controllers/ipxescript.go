@@ -79,11 +79,11 @@ func updateOrCreateComputer(c *gin.Context, id uuid.UUID, mac pgtype.Macaddr, ip
 
 func searchComputer(db *gorm.DB, id uuid.UUID, mac pgtype.Macaddr) (models.Computer, error) {
 	computer := models.Computer{}
-	result := db.Where("uuid = ?", id).First(&computer)
+	result := db.Preload("Tags").Where("uuid = ?", id).First(&computer)
 	if result.RowsAffected > 0 {
 		return computer, nil
 	}
-	result = db.Where("mac = ?", mac.Addr.String()).First(&computer)
+	result = db.Preload("Tags").Where("mac = ?", mac.Addr.String()).First(&computer)
 	if result.RowsAffected > 0 {
 		return computer, nil
 	}
